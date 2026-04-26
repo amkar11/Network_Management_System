@@ -6,6 +6,7 @@ import com.hitachi.network_management_system.enums.DeviceState
 import com.hitachi.network_management_system.event_bus.EventBus
 import com.hitachi.network_management_system.event_bus.EventBus.Companion.flux
 import com.hitachi.network_management_system.repositories.IDevicesRepository
+import com.hitachi.network_management_system.repositories.ITopologyRepository
 import org.springframework.http.codec.ServerSentEvent
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -17,7 +18,7 @@ import kotlin.concurrent.atomics.fetchAndIncrement
 @Service
 @OptIn(ExperimentalAtomicApi::class)
 class DevicesService(
-    private val repository: IDevicesRepository,
+    private val repository: ITopologyRepository,
     private val eventBus: EventBus
 ) : IDevicesService {
 
@@ -26,7 +27,10 @@ class DevicesService(
     override fun changeDevice(id: Int, isActive: Boolean): DeviceDTO {
         eventBus.emitChangesToSubscribers(id, isActive)
         val changedDevice = repository.changeDevice(id, isActive)
-        return changedDevice
+        return DeviceDTO(
+            id = changedDevice.id,
+            name = changedDevice.name,
+            active = changedDevice.active)
     }
 
     override fun returnInitState(id: Int): Flux<ServerSentEvent<SSEStateResponseDTO>> {

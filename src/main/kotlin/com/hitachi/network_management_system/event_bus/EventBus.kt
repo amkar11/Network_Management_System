@@ -1,10 +1,10 @@
 package com.hitachi.network_management_system.event_bus
 
-import com.hitachi.network_management_system.dto.ConnectionDTO
 import com.hitachi.network_management_system.dto.SSEChangedStateResponseDTO
 import com.hitachi.network_management_system.dto.SSEStateResponseDTO
 import com.hitachi.network_management_system.enums.DeviceState
-import com.hitachi.network_management_system.repositories.IDevicesRepository
+import com.hitachi.network_management_system.repositories.ITopologyRepository
+import com.hitachi.network_management_system.topology_mock_db.ConnectionDB
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Sinks
@@ -12,7 +12,7 @@ import kotlin.collections.forEach
 
 @Component
 class EventBus(
-    private val repository: IDevicesRepository
+    private val repository: ITopologyRepository
 ) {
 
     private val subscribers: MutableMap<Int, Sinks.Many<SSEStateResponseDTO>> = mutableMapOf()
@@ -47,9 +47,9 @@ class EventBus(
         val subscribers: List<Int> = getSubscribers()
         val eventType: DeviceState = if (isActive) DeviceState.ADDED else DeviceState.REMOVED
         for (subscriber in subscribers) {
-            val connections: List<ConnectionDTO> = repository.getAllConnectionsByDevicesId(subscriber)
+            val connections: List<ConnectionDB> = repository.getAllConnectionsByDeviceId(subscriber)
             val reachableDevices: MutableList<Int> = mutableListOf()
-            connections.forEach { reachableDevices.add(it.to) }
+            connections.forEach { reachableDevices.add(it.toNode) }
             if (id in reachableDevices) {
                 val index: Int = reachableDevices.indexOf(id)
                 for (i in index..reachableDevices.lastIndex) {

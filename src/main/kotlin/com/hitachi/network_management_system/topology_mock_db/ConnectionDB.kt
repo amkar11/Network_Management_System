@@ -9,6 +9,6 @@ import jakarta.persistence.Id
 class ConnectionDB(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Int,
+    var id: Int? = null,
     var fromNode: Int,
     var toNode: Int)

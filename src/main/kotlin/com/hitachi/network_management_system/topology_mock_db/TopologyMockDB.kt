@@ -1,5 +1,6 @@
 package com.hitachi.network_management_system.topology_mock_db
 import com.hitachi.network_management_system.dto.TopologyDTO
+import com.hitachi.network_management_system.repositories.ITopologyRepository
 import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Component
 import tools.jackson.databind.ObjectMapper
@@ -8,14 +9,14 @@ import java.io.File
 
 @Component
 class TopologyMockDB(
-    private val mapper: ObjectMapper
+    private val mapper: ObjectMapper,
+    private val repository: ITopologyRepository
 ) {
-
-    lateinit var topology: TopologyDTO
 
     @PostConstruct
     fun load() {
-        topology = mapper.readValue(File("topology.json"))
-        println(topology)
+        val topology: TopologyDTO = mapper.readValue(File("topology.json"))
+        repository.createDevices(topology.devices)
+        repository.createConnections(topology.connections)
     }
 }
