@@ -5,7 +5,6 @@ import com.hitachi.network_management_system.dto.SSEStateResponseDTO
 import com.hitachi.network_management_system.enums.DeviceState
 import com.hitachi.network_management_system.event_bus.EventBus
 import com.hitachi.network_management_system.event_bus.EventBus.Companion.flux
-import com.hitachi.network_management_system.repositories.IDevicesRepository
 import com.hitachi.network_management_system.repositories.ITopologyRepository
 import org.springframework.http.codec.ServerSentEvent
 import org.springframework.stereotype.Service

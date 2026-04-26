@@ -4,7 +4,7 @@ import com.hitachi.network_management_system.dto.SSEChangedStateResponseDTO
 import com.hitachi.network_management_system.dto.SSEStateResponseDTO
 import com.hitachi.network_management_system.enums.DeviceState
 import com.hitachi.network_management_system.repositories.ITopologyRepository
-import com.hitachi.network_management_system.topology_mock_db.ConnectionDB
+import com.hitachi.network_management_system.topology_db.ConnectionDB
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Sinks
@@ -14,7 +14,6 @@ import kotlin.collections.forEach
 class EventBus(
     private val repository: ITopologyRepository
 ) {
-
     private val subscribers: MutableMap<Int, Sinks.Many<SSEStateResponseDTO>> = mutableMapOf()
 
     fun publish(id: Int, event: SSEStateResponseDTO) {

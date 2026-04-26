@@ -3,8 +3,8 @@ package com.hitachi.network_management_system.repositories
 import com.hitachi.network_management_system.dto.ConnectionDTO
 import com.hitachi.network_management_system.dto.DeviceDTO
 import com.hitachi.network_management_system.dto.SSEStateResponseDTO
-import com.hitachi.network_management_system.topology_mock_db.ConnectionDB
-import com.hitachi.network_management_system.topology_mock_db.DeviceDB
+import com.hitachi.network_management_system.topology_db.ConnectionDB
+import com.hitachi.network_management_system.topology_db.DeviceDB
 
 interface ITopologyRepository {
     fun changeDevice(id: Int, isActive: Boolean): DeviceDB

@@ -1,4 +1,4 @@
-package com.hitachi.network_management_system.topology_mock_db
+package com.hitachi.network_management_system.topology_db
 
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
