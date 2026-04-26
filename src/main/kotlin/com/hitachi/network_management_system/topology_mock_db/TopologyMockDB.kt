@@ -1,4 +1,4 @@
-package com.hitachi.network_management_system.TopologyMockDB
+package com.hitachi.network_management_system.topology_mock_db
 import com.hitachi.network_management_system.dto.TopologyDTO
 import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Component
@@ -14,7 +14,7 @@ class TopologyMockDB(
     lateinit var topology: TopologyDTO
 
     @PostConstruct
-    fun load(): Unit {
+    fun load() {
         topology = mapper.readValue(File("topology.json"))
         println(topology)
     }

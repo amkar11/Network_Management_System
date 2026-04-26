@@ -5,12 +5,12 @@ import com.hitachi.network_management_system.dto.SSEChangedStateResponseDTO
 import com.hitachi.network_management_system.dto.SSEStateResponseDTO
 import com.hitachi.network_management_system.enums.DeviceState
 import com.hitachi.network_management_system.repositories.IDevicesRepository
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Sinks
 import kotlin.collections.forEach
 
-@Service
+@Component
 class EventBus(
     private val repository: IDevicesRepository
 ) {
