@@ -5,6 +5,7 @@ import com.hitachi.network_management_system.dto.SSEInitStateResponseDTO
 import com.hitachi.network_management_system.dto.SSEStateResponseDTO
 import com.hitachi.network_management_system.enums.DeviceState
 import com.hitachi.network_management_system.topology_db.DeviceDB
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -12,6 +13,8 @@ class DevicesDAO(
     private val devicesRepository: IDevicesRepository,
     private val connectionsDAO: IConnectionsDAO
 ) : IDevicesDAO {
+
+    @Transactional
     override fun changeDevice(id: Int, isActive: Boolean): DeviceDB {
         val device = getDevice(id)
         if (device.active == isActive) return device
@@ -19,11 +22,13 @@ class DevicesDAO(
         return device
     }
 
+    @Transactional
     override fun returnInitState(id: Int): SSEStateResponseDTO {
         val reachableDevices = getDevicesIdList(id)
         return SSEInitStateResponseDTO(DeviceState.INITIAL_STATE.toString(), reachableDevices)
     }
 
+    @Transactional
     override fun getDevicesIdList(id: Int): List<Int> {
         val reachableConnections = connectionsDAO.getReachableConnections(id)
         val reachableDevices: MutableList<Int> = mutableListOf()
@@ -31,6 +36,7 @@ class DevicesDAO(
         return reachableDevices
     }
 
+    @Transactional
     override fun getDevice(id: Int): DeviceDB {
         val deviceDB: DeviceDB = devicesRepository.findById(id)
             .orElseThrow { NoSuchElementException("No device found with id $id") }

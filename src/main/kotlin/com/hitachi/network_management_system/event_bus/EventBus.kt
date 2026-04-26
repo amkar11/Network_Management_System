@@ -4,6 +4,7 @@ import com.hitachi.network_management_system.dto.SSEChangedStateResponseDTO
 import com.hitachi.network_management_system.dto.SSEStateResponseDTO
 import com.hitachi.network_management_system.enums.DeviceState
 import com.hitachi.network_management_system.repositories.IConnectionsDAO
+import com.hitachi.network_management_system.repositories.IDevicesDAO
 import com.hitachi.network_management_system.topology_db.ConnectionDB
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
@@ -12,7 +13,8 @@ import kotlin.collections.forEach
 
 @Component
 class EventBus(
-    private val connectionsDAO: IConnectionsDAO
+    private val connectionsDAO: IConnectionsDAO,
+    private val devicesDAO: IDevicesDAO
 ) {
     private val subscribers: MutableMap<Int, Sinks.Many<SSEStateResponseDTO>> = mutableMapOf()
 
@@ -51,11 +53,22 @@ class EventBus(
             } else {
                 connectionsDAO.getReachableConnections(subscriber)
             }
+
             val reachableDevices: MutableList<Int> = mutableListOf()
             connections.forEach { reachableDevices.add(it.toNode) }
+
+            if (eventType == DeviceState.ADDED) {
+                val index: Int = reachableDevices.indexOf(id)
+                for (i in reachableDevices.indices) {
+                    val device = devicesDAO.getDevice((reachableDevices[i]))
+                    if (!device.active && i < index) return
+                }
+            }
+
             if (id in reachableDevices) {
                 val index: Int = reachableDevices.indexOf(id)
                 for (i in index..reachableDevices.lastIndex) {
+                    if (i != index && !devicesDAO.getDevice(reachableDevices[i]).active) break
                     publish(subscriber, SSEChangedStateResponseDTO(eventType.toString(), reachableDevices[i]))
                 }
             }
