@@ -3,7 +3,7 @@ package com.hitachi.network_management_system.event_bus
 import com.hitachi.network_management_system.dto.SSEChangedStateResponseDTO
 import com.hitachi.network_management_system.dto.SSEStateResponseDTO
 import com.hitachi.network_management_system.enums.DeviceState
-import com.hitachi.network_management_system.repositories.ITopologyRepository
+import com.hitachi.network_management_system.repositories.IConnectionsDAO
 import com.hitachi.network_management_system.topology_db.ConnectionDB
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
@@ -12,7 +12,7 @@ import kotlin.collections.forEach
 
 @Component
 class EventBus(
-    private val repository: ITopologyRepository
+    private val connectionsDAO: IConnectionsDAO
 ) {
     private val subscribers: MutableMap<Int, Sinks.Many<SSEStateResponseDTO>> = mutableMapOf()
 
@@ -46,7 +46,11 @@ class EventBus(
         val subscribers: List<Int> = getSubscribers()
         val eventType: DeviceState = if (isActive) DeviceState.ADDED else DeviceState.REMOVED
         for (subscriber in subscribers) {
-            val connections: List<ConnectionDB> = repository.getAllConnectionsByDeviceId(subscriber)
+            val connections: List<ConnectionDB> = if (eventType == DeviceState.ADDED) {
+                connectionsDAO.getAllConnectionsByDeviceId(subscriber)
+            } else {
+                connectionsDAO.getReachableConnections(subscriber)
+            }
             val reachableDevices: MutableList<Int> = mutableListOf()
             connections.forEach { reachableDevices.add(it.toNode) }
             if (id in reachableDevices) {
