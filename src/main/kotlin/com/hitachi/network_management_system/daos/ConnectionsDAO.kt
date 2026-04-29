@@ -1,6 +1,8 @@
-package com.hitachi.network_management_system.repositories
+package com.hitachi.network_management_system.daos
 
 import com.hitachi.network_management_system.dto.ConnectionDTO
+import com.hitachi.network_management_system.repositories.IConnectionsRepository
+import com.hitachi.network_management_system.repositories.IDevicesRepository
 import com.hitachi.network_management_system.topology_db.ConnectionDB
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Repository
@@ -16,8 +18,7 @@ class ConnectionsDAO(
         val allConnections = getAllConnectionsByDeviceId(id)
         val reachableConnections: MutableList<ConnectionDB> = mutableListOf()
         for (connection in allConnections) {
-            val device = devicesRepository.findById(connection.toNode)
-                .orElseThrow { NoSuchElementException("No device found with id $id") }
+            val device = devicesRepository.findById(connection.toNode).get()
             if (!device.active) break
             reachableConnections.add(connection)
         }
@@ -26,6 +27,8 @@ class ConnectionsDAO(
 
     @Transactional
     override fun getAllConnectionsByDeviceId(fromNode: Int): List<ConnectionDB> {
+        devicesRepository.findById(fromNode).
+            orElseThrow { NoSuchElementException("No device found with id $fromNode") }
         return connectionsRepository.findAllByFromNode(fromNode)
     }
 

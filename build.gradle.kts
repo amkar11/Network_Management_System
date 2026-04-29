@@ -33,6 +33,9 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
+    testImplementation("io.mockk:mockk:1.14.9")
+    testImplementation("io.projectreactor:reactor-test:3.8.5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

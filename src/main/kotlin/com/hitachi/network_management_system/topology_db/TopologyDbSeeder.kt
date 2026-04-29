@@ -1,7 +1,7 @@
 package com.hitachi.network_management_system.topology_db
 import com.hitachi.network_management_system.dto.TopologyDTO
-import com.hitachi.network_management_system.repositories.IConnectionsDAO
-import com.hitachi.network_management_system.repositories.IDevicesDAO
+import com.hitachi.network_management_system.daos.IConnectionsDAO
+import com.hitachi.network_management_system.daos.IDevicesDAO
 import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Component
 import tools.jackson.databind.ObjectMapper

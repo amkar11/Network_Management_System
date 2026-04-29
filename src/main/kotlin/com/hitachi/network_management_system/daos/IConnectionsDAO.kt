@@ -1,4 +1,4 @@
-package com.hitachi.network_management_system.repositories
+package com.hitachi.network_management_system.daos
 
 import com.hitachi.network_management_system.dto.ConnectionDTO
 import com.hitachi.network_management_system.topology_db.ConnectionDB

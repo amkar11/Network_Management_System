@@ -1,11 +1,12 @@
 package com.hitachi.network_management_system.services
 
 import com.hitachi.network_management_system.dto.DeviceDTO
+import com.hitachi.network_management_system.dto.SSEInitStateResponseDTO
 import com.hitachi.network_management_system.dto.SSEStateResponseDTO
 import com.hitachi.network_management_system.enums.DeviceState
 import com.hitachi.network_management_system.event_bus.EventBus
 import com.hitachi.network_management_system.event_bus.EventBus.Companion.flux
-import com.hitachi.network_management_system.repositories.IDevicesDAO
+import com.hitachi.network_management_system.daos.IDevicesDAO
 import org.springframework.http.codec.ServerSentEvent
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -16,10 +17,10 @@ import kotlin.concurrent.atomics.fetchAndIncrement
 
 @Service
 @OptIn(ExperimentalAtomicApi::class)
-class DevicesService(
+class TopologyService(
     private val devicesDAO: IDevicesDAO,
     private val eventBus: EventBus
-) : IDevicesService {
+) : ITopologyService {
 
     val atomicInt = AtomicInt(1)
 
@@ -33,7 +34,8 @@ class DevicesService(
     }
 
     override fun returnInitState(id: Int): Flux<ServerSentEvent<SSEStateResponseDTO>> {
-        val sseResponse = devicesDAO.returnInitState(id)
+        val reachableDevices = devicesDAO.getDevicesIdList(id)
+        val sseResponse = SSEInitStateResponseDTO(DeviceState.INITIAL_STATE.toString(), reachableDevices)
         val initState = Flux.just(ServerSentEvent.builder<SSEStateResponseDTO>()
             .id("0")
             .data(sseResponse)
@@ -42,7 +44,7 @@ class DevicesService(
             .build()
         )
         eventBus.subscribe(id)
-        return  initState
+        return initState
     }
 
     override fun getStateUpdate(id: Int): Flux<ServerSentEvent<SSEStateResponseDTO>> {

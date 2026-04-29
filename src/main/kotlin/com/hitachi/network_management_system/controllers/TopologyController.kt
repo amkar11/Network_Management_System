@@ -3,7 +3,7 @@ package com.hitachi.network_management_system.controllers
 import com.hitachi.network_management_system.dto.DeviceDTO
 import com.hitachi.network_management_system.dto.SSEStateResponseDTO
 import com.hitachi.network_management_system.dto.StateDTO
-import com.hitachi.network_management_system.services.IDevicesService
+import com.hitachi.network_management_system.services.ITopologyService
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -19,17 +19,16 @@ import reactor.core.publisher.Flux
 
 @RestController
 @RequestMapping("/devices/{id}")
-class DevicesController(
-    private val service: IDevicesService,
+class TopologyController(
+    private val service: ITopologyService,
 ) {
     @ExceptionHandler(NoSuchElementException::class)
         fun handleNotFound(e: NoSuchElementException): ResponseEntity<String> =
         ResponseEntity(e.message, HttpStatus.NOT_FOUND)
 
     @PatchMapping
-    fun changeDevice(@PathVariable id: Int, @RequestBody state: StateDTO): DeviceDTO {
-        return service.changeDevice(id, state.active)
-    }
+    fun changeDevice(@PathVariable id: Int, @RequestBody state: StateDTO): DeviceDTO =
+            service.changeDevice(id, state.active)
 
     @GetMapping("/reachable-devices", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
    fun getReachableDevices(@PathVariable id: Int): Flux<ServerSentEvent<SSEStateResponseDTO>> {
