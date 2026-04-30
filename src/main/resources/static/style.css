@@ -1,3 +1,106 @@
+*, *:before, *:after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Share Tech Mono", monospace;
+}
+
+:root {
+    --frozen-lake: #6ECBF5;
+    --royal-blue: #586AE2;
+    --space-indigo: #2A2356;
+    --vivid-orchid: #C252E1;
+    --lavender: #E0D9F6;
+    --switch-turned-off: #df4141;
+}
+
 body {
-    background: #8a8ade;
+    background-color: var(--lavender);
+}
+
+.nav-container {
+    width: 100%;
+    height: 10vh;
+    background-color: var(--royal-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-container span {
+    font-family: "Audiowide", sans-serif;
+    user-select: none;
+    font-size: 2rem;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    padding: 20px;
+    gap: 20px;
+}
+
+.device-card {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+    background-color: var(--space-indigo);
+    color: var(--frozen-lake);
+    font-size: 1.5rem;
+    padding: 10px;
+    box-shadow: 0 0 20px var(--frozen-lake);
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.device-card-turned-off {
+    box-shadow: 0 0 20px var(--switch-turned-off);
+}
+
+.device-card:hover {
+    transform: scale(1.01);
+}
+
+.device-card+span {
+    color: var(--frozen-lake);
+    font-size: 1.5rem;
+    user-select: none;
+}
+
+.device-card img {
+    height: 70%;
+    width: 90%;
+    object-fit: cover;
+    margin-top: 5px;
+    user-select: none;
+}
+
+.switch-container {
+    margin-top: 10px;
+    width: 90%;
+}
+
+.switch {
+    width: 20%;
+    height: 30px;
+    background-color: var(--frozen-lake);
+    opacity: 0.99;
+}
+
+.switch-turned-off {
+    transform: translateX(400%);
+    background-color: var(--switch-turned-off);
+}
+
+.switch-background {
+    width: 100%;
+    height: 30px;
+    background-color: var(--lavender);
+    float: left;
+    text-align: center;
+}
+
+.switch-background-span-turned-off {
+    color: var(--switch-turned-off)
 }

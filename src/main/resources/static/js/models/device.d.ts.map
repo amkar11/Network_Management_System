@@ -1,0 +1,1 @@
+{"version":3,"file":"device.d.ts","sourceRoot":"","sources":["device.ts"],"names":[],"mappings":"AAAA,MAAM,CAAC,OAAO,OAAO,MAAM;IACvB,EAAE,EAAE,MAAM,CAAC;IACX,IAAI,EAAE,MAAM,CAAC;IACb,MAAM,EAAE,OAAO,CAAC;gBACJ,EAAE,EAAE,MAAM,EAAE,IAAI,EAAE,MAAM,EAAE,MAAM,EAAE,OAAO;CAKxD"}
