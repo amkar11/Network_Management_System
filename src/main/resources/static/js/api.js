@@ -8,25 +8,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import Store from './store.js';
+import { drawInitialState, addOrDeleteDeviceCard } from "./overlay.js";
 const baseUrl = 'http://localhost:8080/devices/';
 export function createSseConnection(deviceId) {
     const getUrl = baseUrl + `${deviceId}/reachable-devices`;
     const sse = new EventSource(getUrl);
     Store.eventSource = sse;
     sse.addEventListener("INITIAL_STATE", (e) => {
-        console.log(e.data);
-        console.log(e.type);
+        drawInitialState(e.data);
     });
     sse.addEventListener("update", (e) => {
+        addOrDeleteDeviceCard(e.data);
         console.log(e.data);
-        console.log(e.type);
     });
     sse.onerror = (error) => {
         console.error('Event source failed: ', error);
     };
 }
 export function closeSseConnection() {
-    Store.eventSource.close();
+    if (Store.eventSource !== null) {
+        Store.eventSource.close();
+        Store.eventSource = null;
+    }
 }
 export function performPatchRequest(deviceId, active) {
     return __awaiter(this, void 0, void 0, function* () {

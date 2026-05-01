@@ -22,7 +22,7 @@ export default function seeder() {
 
         // City name span
         const cityName = document.createElement("span");
-        cityName.textContent = device.name;
+        cityName.textContent = `${device.name} - id: ${device.id}`;
 
         // Image
         const img = document.createElement("img");

@@ -18,7 +18,7 @@ export default function seeder() {
         Store.addDevice(device);
         // City name span
         const cityName = document.createElement("span");
-        cityName.textContent = device.name;
+        cityName.textContent = `${device.name} - id: ${device.id}`;
         // Image
         const img = document.createElement("img");
         img.src = (_b = imgLinks[i]) !== null && _b !== void 0 ? _b : '';

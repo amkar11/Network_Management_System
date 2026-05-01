@@ -3,7 +3,7 @@ import Device from "./models/device.js";
 class Store {
      private state = {
         devicesList: [] as Device[],
-        currentSubscriptionId: 0,
+        currentSubscriptionId: 0 as number | null,
         isConnectionsOverlayActive: false,
          imgLinksList: ['media/warszawa.jpg', 'media/krakow.webp', 'media/wroclaw.jpg', 'media/poznan.webp',
              'media/gdansk.jpg', 'media/szczecin.jpg', 'media/bydgoszcz.jpg', 'media/lublin.jpg', 'media/katowice.jpg',
@@ -37,7 +37,7 @@ class Store {
          return this.state.currentSubscriptionId;
      }
 
-     set currentSubscriptionId(newId: number) {
+     set currentSubscriptionId(newId: number | null) {
         this.state.currentSubscriptionId = newId;
      }
 
@@ -52,9 +52,9 @@ class Store {
 
     // eventSource
     get eventSource() {
-         return this.state.eventSource as EventSource;
+         return this.state.eventSource;
     }
-    set eventSource(newEventSource: EventSource) {
+    set eventSource(newEventSource: EventSource | null) {
         this.state.eventSource = newEventSource;
     }
 

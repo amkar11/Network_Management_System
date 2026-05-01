@@ -18,9 +18,14 @@ gridContainer.addEventListener("click", (e) => __awaiter(void 0, void 0, void 0,
         yield ui.toggleDevice(e);
     }
     else if (e.target.closest('.device-card')) {
-        yield ui.toggleSubscription(e);
+        ui.toggleSubscription(e);
     }
 }));
+document.addEventListener("click", (e) => {
+    if (e.target.closest('#overlay-cross')) {
+        ui.closeOverlayByCross(e);
+    }
+});
 document.addEventListener("DOMContentLoaded", (e) => {
     seeder();
 });

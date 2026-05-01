@@ -1,6 +1,7 @@
 import throwNullReferenceError from "./helpers/nullError.js";
 import Store from "./store.js";
 import { performPatchRequest, createSseConnection, closeSseConnection } from "./api.js";
+import { clearOverlay } from "./overlay.js";
 
 export default class Ui {
 
@@ -27,7 +28,7 @@ export default class Ui {
         switchSpan.textContent = (switchSpan.textContent == 'Turned on') ? 'Turned off' : 'Turned on'
     }
 
-    async toggleSubscription(e: Event) {
+    toggleSubscription(e: Event) {
         const deviceCard
             = (e.target! as HTMLElement).closest(".device-card") as HTMLDivElement
             ?? throwNullReferenceError('Device is not found')
@@ -36,16 +37,44 @@ export default class Ui {
             throwNullReferenceError(`deviceId data attribute with id does not exist`);
 
         if (!Store.getDeviceById(deviceId)?.active) return;
-        if (Store.eventSource !== null) {
-            closeSseConnection()
-        }
+
+        const overlay = document.querySelector('.connections-overlay') ??
+            throwNullReferenceError(`Connections overlay not found`);
+
         if (deviceId === Store.currentSubscriptionId) {
             closeSseConnection();
+            clearOverlay();
+            Store.isConnectionsOverlayActive = false;
+            Store.currentSubscriptionId = null;
+            overlay.classList.remove('connections-overlay-active')
             return;
+        }
+
+        if (Store.eventSource !== null || deviceId !== Store.currentSubscriptionId) {
+            closeSseConnection()
+            clearOverlay();
+            Store.currentSubscriptionId = null;
+            Store.isConnectionsOverlayActive = false;
+            overlay.classList.remove('connections-overlay-active')
         }
 
         createSseConnection(deviceId)
         Store.currentSubscriptionId = deviceId;
+        overlay.classList.add('connections-overlay-active');
+        const overlayTitle = overlay.querySelector('h2') ??
+            throwNullReferenceError('Overlay h2 is not found');
+        overlayTitle.textContent = `Reachable devices for device ${deviceId}`;
+        Store.isConnectionsOverlayActive = true;
+    }
 
+    closeOverlayByCross(e: Event) {
+        Store.currentSubscriptionId = null;
+        Store.eventSource = null;
+        Store.isConnectionsOverlayActive = false;
+
+        const overlay = document.querySelector('.connections-overlay') ??
+            throwNullReferenceError(`Connections overlay not found`);
+        clearOverlay();
+        overlay.classList.remove('connections-overlay-active')
     }
 }

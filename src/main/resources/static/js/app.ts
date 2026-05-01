@@ -10,7 +10,13 @@ gridContainer.addEventListener("click", async (e) => {
     if ((e.target as HTMLElement).closest('.device-card .switch-container')) {
         await ui.toggleDevice(e);
     } else if ((e.target as HTMLElement).closest('.device-card')) {
-        await ui.toggleSubscription(e);
+        ui.toggleSubscription(e);
+    }
+})
+
+document.addEventListener("click", (e) => {
+    if ((e.target as HTMLElement).closest('#overlay-cross')) {
+        ui.closeOverlayByCross(e);
     }
 })
 

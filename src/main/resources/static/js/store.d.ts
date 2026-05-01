@@ -6,12 +6,12 @@ declare class Store {
     getDeviceById(id: number): Device | undefined;
     addDevice(device: Device): void;
     get imgLinksList(): string[];
-    get currentSubscriptionId(): number;
-    set currentSubscriptionId(newId: number);
+    get currentSubscriptionId(): number | null;
+    set currentSubscriptionId(newId: number | null);
     get isConnectionsOverlayActive(): boolean;
     set isConnectionsOverlayActive(isActive: boolean);
-    get eventSource(): EventSource;
-    set eventSource(newEventSource: EventSource);
+    get eventSource(): EventSource | null;
+    set eventSource(newEventSource: EventSource | null);
     subscribe(callback: Function): () => boolean;
     private notify;
 }

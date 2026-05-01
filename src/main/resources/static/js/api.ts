@@ -1,5 +1,6 @@
 import Store from './store.js';
 import type Device from "./models/device";
+import { drawInitialState, addOrDeleteDeviceCard } from "./overlay.js";
 
 const baseUrl = 'http://localhost:8080/devices/'
 
@@ -8,12 +9,11 @@ export function createSseConnection(deviceId: number) {
     const sse = new EventSource(getUrl);
     Store.eventSource = sse;
     sse.addEventListener("INITIAL_STATE", (e) => {
-        console.log(e.data);
-        console.log(e.type)
+        drawInitialState(e.data)
     })
     sse.addEventListener("update", (e) => {
-        console.log(e.data);
-        console.log(e.type)
+        addOrDeleteDeviceCard(e.data)
+        console.log(e.data)
     })
     sse.onerror = (error) => {
         console.error('Event source failed: ', error);
@@ -21,7 +21,10 @@ export function createSseConnection(deviceId: number) {
 }
 
 export function closeSseConnection() {
-    Store.eventSource.close();
+    if (Store.eventSource !== null) {
+        Store.eventSource.close();
+        Store.eventSource = null;
+    }
 }
 
 export async function performPatchRequest(deviceId: number, active: boolean): Promise<Device> {

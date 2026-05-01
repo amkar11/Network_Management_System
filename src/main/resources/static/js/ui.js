@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import throwNullReferenceError from "./helpers/nullError.js";
 import Store from "./store.js";
 import { performPatchRequest, createSseConnection, closeSseConnection } from "./api.js";
+import { clearOverlay } from "./overlay.js";
 export default class Ui {
     toggleDevice(e) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -28,22 +29,42 @@ export default class Ui {
         });
     }
     toggleSubscription(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b, _c;
-            const deviceCard = (_a = e.target.closest(".device-card")) !== null && _a !== void 0 ? _a : throwNullReferenceError('Device is not found');
-            const deviceId = (_b = Number(deviceCard.dataset.deviceId)) !== null && _b !== void 0 ? _b : throwNullReferenceError(`deviceId data attribute with id does not exist`);
-            if (!((_c = Store.getDeviceById(deviceId)) === null || _c === void 0 ? void 0 : _c.active))
-                return;
-            if (Store.eventSource !== null) {
-                closeSseConnection();
-            }
-            if (deviceId === Store.currentSubscriptionId) {
-                closeSseConnection();
-                return;
-            }
-            createSseConnection(deviceId);
-            Store.currentSubscriptionId = deviceId;
-        });
+        var _a, _b, _c, _d, _e;
+        const deviceCard = (_a = e.target.closest(".device-card")) !== null && _a !== void 0 ? _a : throwNullReferenceError('Device is not found');
+        const deviceId = (_b = Number(deviceCard.dataset.deviceId)) !== null && _b !== void 0 ? _b : throwNullReferenceError(`deviceId data attribute with id does not exist`);
+        if (!((_c = Store.getDeviceById(deviceId)) === null || _c === void 0 ? void 0 : _c.active))
+            return;
+        const overlay = (_d = document.querySelector('.connections-overlay')) !== null && _d !== void 0 ? _d : throwNullReferenceError(`Connections overlay not found`);
+        if (deviceId === Store.currentSubscriptionId) {
+            closeSseConnection();
+            clearOverlay();
+            Store.isConnectionsOverlayActive = false;
+            Store.currentSubscriptionId = null;
+            overlay.classList.remove('connections-overlay-active');
+            return;
+        }
+        if (Store.eventSource !== null || deviceId !== Store.currentSubscriptionId) {
+            closeSseConnection();
+            clearOverlay();
+            Store.currentSubscriptionId = null;
+            Store.isConnectionsOverlayActive = false;
+            overlay.classList.remove('connections-overlay-active');
+        }
+        createSseConnection(deviceId);
+        Store.currentSubscriptionId = deviceId;
+        overlay.classList.add('connections-overlay-active');
+        const overlayTitle = (_e = overlay.querySelector('h2')) !== null && _e !== void 0 ? _e : throwNullReferenceError('Overlay h2 is not found');
+        overlayTitle.textContent = `Reachable devices for device ${deviceId}`;
+        Store.isConnectionsOverlayActive = true;
+    }
+    closeOverlayByCross(e) {
+        var _a;
+        Store.currentSubscriptionId = null;
+        Store.eventSource = null;
+        Store.isConnectionsOverlayActive = false;
+        const overlay = (_a = document.querySelector('.connections-overlay')) !== null && _a !== void 0 ? _a : throwNullReferenceError(`Connections overlay not found`);
+        clearOverlay();
+        overlay.classList.remove('connections-overlay-active');
     }
 }
 //# sourceMappingURL=ui.js.map
