@@ -23,7 +23,10 @@ gridContainer.addEventListener("click", (e) => __awaiter(void 0, void 0, void 0,
 }));
 document.addEventListener("click", (e) => {
     if (e.target.closest('#overlay-cross')) {
-        ui.closeOverlayByCross(e);
+        ui.closeOverlayByCross();
+    }
+    else if (e.target.closest('#popup-cross')) {
+        ui.closePopup();
     }
 });
 document.addEventListener("DOMContentLoaded", (e) => {

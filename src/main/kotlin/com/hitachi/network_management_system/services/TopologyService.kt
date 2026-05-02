@@ -25,6 +25,10 @@ class TopologyService(
     val atomicInt = AtomicInt(1)
 
     override fun changeDevice(id: Int, isActive: Boolean): DeviceDTO {
+        val device = devicesDAO.getDevice(id)
+        if (device.active == isActive) {
+            return DeviceDTO(device.id, device.name, device.active)
+        }
         eventBus.emitChangesToSubscribers(id, isActive)
         val changedDevice = devicesDAO.changeDevice(id, isActive)
         return DeviceDTO(

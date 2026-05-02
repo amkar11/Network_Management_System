@@ -3,7 +3,7 @@ class Store {
     constructor() {
         this.state = {
             devicesList: [],
-            currentSubscriptionId: 0,
+            currentSubscriptionId: null,
             isConnectionsOverlayActive: false,
             imgLinksList: ['media/warszawa.jpg', 'media/krakow.webp', 'media/wroclaw.jpg', 'media/poznan.webp',
                 'media/gdansk.jpg', 'media/szczecin.jpg', 'media/bydgoszcz.jpg', 'media/lublin.jpg', 'media/katowice.jpg',

@@ -12,6 +12,10 @@ export default class Ui {
 
         const deviceId = Number(deviceCard.dataset.deviceId) ??
             throwNullReferenceError(`deviceId data attribute with id does not exist`);
+        if (Store.isConnectionsOverlayActive && deviceId === Store.currentSubscriptionId) {
+            this.openOrUpdatePopup("To turn off the device you have to unsubscribe first");
+            return;
+        }
         const deviceStore = Store.getDeviceById(deviceId) ??
         throwNullReferenceError(`There is no device with id ${deviceId} in the store`);
 
@@ -26,6 +30,11 @@ export default class Ui {
         switchButton.classList.toggle('switch-turned-off');
         switchSpan.classList.toggle('switch-background-span-turned-off');
         switchSpan.textContent = (switchSpan.textContent == 'Turned on') ? 'Turned off' : 'Turned on'
+        if (switchSpan.textContent == 'Turned off') {
+            this.openOrUpdatePopup(`You turned off the device with id ${deviceId}`);
+        } else {
+            this.openOrUpdatePopup(`You turned on the device with id ${deviceId}`);
+        }
     }
 
     toggleSubscription(e: Event) {
@@ -36,7 +45,10 @@ export default class Ui {
         const deviceId = Number(deviceCard.dataset.deviceId) ??
             throwNullReferenceError(`deviceId data attribute with id does not exist`);
 
-        if (!Store.getDeviceById(deviceId)?.active) return;
+        if (!Store.getDeviceById(deviceId)?.active) {
+            this.openOrUpdatePopup("You have to turn on the device before subscribing to it")
+            return;
+        }
 
         const overlay = document.querySelector('.connections-overlay') ??
             throwNullReferenceError(`Connections overlay not found`);
@@ -46,7 +58,8 @@ export default class Ui {
             clearOverlay();
             Store.isConnectionsOverlayActive = false;
             Store.currentSubscriptionId = null;
-            overlay.classList.remove('connections-overlay-active')
+            overlay.classList.remove('connections-overlay-active');
+            this.openOrUpdatePopup(`You unsubscribed from device ${deviceId}`);
             return;
         }
 
@@ -56,6 +69,7 @@ export default class Ui {
             Store.currentSubscriptionId = null;
             Store.isConnectionsOverlayActive = false;
             overlay.classList.remove('connections-overlay-active')
+            this.openOrUpdatePopup(`You unsubscribed from device ${deviceId}`);
         }
 
         createSseConnection(deviceId)
@@ -65,16 +79,39 @@ export default class Ui {
             throwNullReferenceError('Overlay h2 is not found');
         overlayTitle.textContent = `Reachable devices for device ${deviceId}`;
         Store.isConnectionsOverlayActive = true;
+        this.openOrUpdatePopup(`You subscribed to device ${deviceId}`);
     }
 
-    closeOverlayByCross(e: Event) {
-        Store.currentSubscriptionId = null;
-        Store.eventSource = null;
-        Store.isConnectionsOverlayActive = false;
+        closeOverlayByCross() {
+            Store.currentSubscriptionId = null;
+            Store.eventSource = null;
+            Store.isConnectionsOverlayActive = false;
 
-        const overlay = document.querySelector('.connections-overlay') ??
-            throwNullReferenceError(`Connections overlay not found`);
-        clearOverlay();
-        overlay.classList.remove('connections-overlay-active')
+            const overlay = document.querySelector('.connections-overlay') ??
+                throwNullReferenceError(`Connections overlay not found`);
+            clearOverlay();
+            overlay.classList.remove('connections-overlay-active')
+    }
+
+    openOrUpdatePopup(text: string) {
+        const popup = document.querySelector('.popup-wrapper') ??
+            throwNullReferenceError('Popup wrapper is not found');
+        const span = popup.querySelector('span#popup-text') ??
+            throwNullReferenceError('Popup span is not found');
+        if (popup.classList.contains('popup-active')) {
+            span.textContent = text;
+            return;
+        }
+        popup.classList.add('popup-active');
+        span.textContent = text;
+        }
+
+    closePopup() {
+        const popup = document.querySelector('.popup-wrapper') ??
+            throwNullReferenceError('Popup wrapper is not found');
+        const span = popup.querySelector('span#popup-text') ??
+            throwNullReferenceError('Popup span is not found');
+        span.textContent = '';
+        popup.classList.remove('popup-active');
     }
 }

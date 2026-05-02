@@ -16,7 +16,9 @@
 
 body {
     background-color: var(--lavender);
+    position: relative;
 }
+
 
 .nav-container {
     width: 100%;
@@ -175,3 +177,54 @@ body {
     height: 80%;
 }
 
+.popup-wrapper {
+    display: none;
+    position: absolute;
+    height: 100%;
+    top: 30px;
+    left: 30px;
+    pointer-events: none;
+}
+
+.popup-active {
+    display: block;
+}
+
+.notification-popup {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: sticky;
+    top: 20px;
+    left: 20px;
+    background-color: var(--vivid-orchid);
+    height: 150px;
+    width: 350px;
+    padding: 10px;
+    z-index: 10;
+    border: 4px solid #0048b6;
+    pointer-events: auto;
+}
+
+#popup-cross-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 30px;
+    height: 30px;
+    font-size: 1.3rem;
+    user-select: none;
+    cursor: pointer;
+}
+
+#popup-cross-wrapper:hover {
+    background-color: var(--lavender);
+}
+
+#popup-text {
+    text-align: center;
+    font-size: 1.3rem;
+}

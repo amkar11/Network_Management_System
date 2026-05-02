@@ -3,7 +3,7 @@ import Device from "./models/device.js";
 class Store {
      private state = {
         devicesList: [] as Device[],
-        currentSubscriptionId: 0 as number | null,
+        currentSubscriptionId: null as number | null,
         isConnectionsOverlayActive: false,
          imgLinksList: ['media/warszawa.jpg', 'media/krakow.webp', 'media/wroclaw.jpg', 'media/poznan.webp',
              'media/gdansk.jpg', 'media/szczecin.jpg', 'media/bydgoszcz.jpg', 'media/lublin.jpg', 'media/katowice.jpg',

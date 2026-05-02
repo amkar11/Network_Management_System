@@ -65,7 +65,7 @@ class EventBus(
             val reachableDevices: MutableList<Int> = mutableListOf()
             connections.forEach { reachableDevices.add(it.toNode) }
 
-            if (id !in reachableDevices) break
+            if (id !in reachableDevices) continue
 
             // To loop only through devices which come after the changed one
             val index: Int = reachableDevices.indexOf(id)
@@ -82,7 +82,7 @@ class EventBus(
                     }
                 }
             }
-            if (broke) break
+            if (broke) continue
 
             // Loops through all reachable devices - if some device which comes after the changed one is unreachable - loop is broken
             // Otherwise, SSEChangedState event gets emitted and Sinks.EmitResult added to the eventsList for testing purposes
