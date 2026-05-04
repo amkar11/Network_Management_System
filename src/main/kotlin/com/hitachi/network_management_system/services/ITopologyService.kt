@@ -6,7 +6,7 @@ import org.springframework.http.codec.ServerSentEvent
 import reactor.core.publisher.Flux
 
 interface ITopologyService {
-    fun changeDevice(id: Int, isActive: Boolean): DeviceDTO
-    fun returnInitState(id: Int): Flux<ServerSentEvent<SSEStateResponseDTO>>
+    suspend fun changeDevice(id: Int, isActive: Boolean): DeviceDTO
+    suspend fun  returnInitState(id: Int): Flux<ServerSentEvent<SSEStateResponseDTO>>
     fun getStateUpdate(id: Int): Flux<ServerSentEvent<SSEStateResponseDTO>>
 }

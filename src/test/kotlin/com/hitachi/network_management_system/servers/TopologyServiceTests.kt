@@ -10,9 +10,12 @@ import com.hitachi.network_management_system.daos.IConnectionsDAO
 import com.hitachi.network_management_system.daos.IDevicesDAO
 import com.hitachi.network_management_system.services.TopologyService
 import com.hitachi.network_management_system.topology_db.DeviceDB
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -39,11 +42,11 @@ class TopologyServiceTests {
     inner class TopologyServiceTestsHappyPath {
 
         @Test
-        fun `should return changed devices`() {
+        fun `should return changed devices`() = runTest {
             // given
             val deviceDb = DeviceDB(deviceId, "example", false)
             val deviceDto = DeviceDTO(deviceId, "example", false)
-            every { mockDevicesDao.changeDevice(deviceId, false) } returns deviceDb
+            coEvery { mockDevicesDao.changeDevice(deviceId, false) } returns deviceDb
 
             // when
             val changedDevice = topologyService.changeDevice(deviceId, false)
@@ -53,11 +56,11 @@ class TopologyServiceTests {
         }
 
         @Test
-        fun `should return initial state`() {
+        fun `should return initial state`() = runTest {
             // given
             val reachableDevices = listOf(1, 2, 3, 5)
             val event = DeviceState.INITIAL_STATE.toString()
-            every { mockDevicesDao.getDevicesIdList(deviceId) } returns reachableDevices
+            coEvery { mockDevicesDao.getDevicesIdList(deviceId) } returns reachableDevices
             val response = SSEInitStateResponseDTO(event, reachableDevices)
 
             val sse = ServerSentEvent.builder<SSEStateResponseDTO>()

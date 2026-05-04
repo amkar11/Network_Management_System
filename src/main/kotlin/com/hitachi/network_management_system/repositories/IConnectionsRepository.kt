@@ -1,8 +1,11 @@
 package com.hitachi.network_management_system.repositories
 
 import com.hitachi.network_management_system.topology_db.ConnectionDB
-import org.springframework.data.jpa.repository.JpaRepository
+import kotlinx.coroutines.flow.Flow
+import org.springframework.data.repository.kotlin.CoroutineCrudRepository
+import org.springframework.stereotype.Repository
 
-interface IConnectionsRepository : JpaRepository<ConnectionDB, Int> {
-    fun findAllByFromNode(fromNode: Int): List<ConnectionDB>
+@Repository
+interface IConnectionsRepository : CoroutineCrudRepository<ConnectionDB, Int> {
+    fun findAllByFromNode(fromNode: Int): Flow<ConnectionDB>
 }

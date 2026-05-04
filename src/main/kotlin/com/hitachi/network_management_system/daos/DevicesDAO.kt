@@ -3,41 +3,36 @@ package com.hitachi.network_management_system.daos
 import com.hitachi.network_management_system.dto.DeviceDTO
 import com.hitachi.network_management_system.repositories.IDevicesRepository
 import com.hitachi.network_management_system.topology_db.DeviceDB
-import jakarta.transaction.Transactional
-import org.springframework.stereotype.Repository
+import kotlinx.coroutines.flow.collect
+import org.springframework.stereotype.Component
 
-@Repository
+@Component
 class DevicesDAO(
     private val devicesRepository: IDevicesRepository,
     private val connectionsDAO: IConnectionsDAO
 ) : IDevicesDAO {
 
-    @Transactional
-    override fun changeDevice(id: Int, isActive: Boolean): DeviceDB {
+    override suspend fun changeDevice(id: Int, isActive: Boolean): DeviceDB {
         val device = getDevice(id)
         if (device.active == isActive) return device
-        device.active = isActive
-        return device
+        val updated = device.copy(active = isActive)
+        return devicesRepository.save(updated)
     }
 
-    @Transactional
-    override fun getDevicesIdList(id: Int): List<Int> {
+    override suspend fun getDevicesIdList(id: Int): List<Int> {
         val reachableConnections = connectionsDAO.getReachableConnections(id)
-        val reachableDevices: MutableList<Int> = mutableListOf()
-        reachableConnections.forEach { reachableDevices.add(it.toNode) }
+        val reachableDevices = reachableConnections.map {it.toNode}
         return reachableDevices
     }
 
-    @Transactional
-    override fun getDevice(id: Int): DeviceDB {
-        val deviceDB: DeviceDB = devicesRepository.findById(id)
-            .orElseThrow { NoSuchElementException("No device found with id $id") }
+    override suspend fun getDevice(id: Int): DeviceDB {
+        val deviceDB = devicesRepository.findById(id) ?:
+            throw NoSuchElementException("No device found with id $id")
         return deviceDB
     }
 
-    override fun createDevices(devices: List<DeviceDTO>) {
-        val devicesDB: MutableList<DeviceDB> = mutableListOf()
-        devices. forEach { devicesDB.add(DeviceDB(it.id, it.name, it.active)) }
-        devicesRepository.saveAll(devicesDB)
+    override suspend fun createDevices(devices: List<DeviceDTO>) {
+        val devicesDB = devices.map {DeviceDB(null, it.name, it.active)}
+        devicesRepository.saveAll(devicesDB).collect()
     }
 }

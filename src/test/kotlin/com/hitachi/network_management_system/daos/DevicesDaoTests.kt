@@ -1,14 +1,16 @@
 package com.hitachi.network_management_system.daos
 
 import com.hitachi.network_management_system.topology_db.DeviceDB
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.TestConstructor
-import kotlin.test.Test
 
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
@@ -29,7 +31,7 @@ class DevicesDaoTests(
     inner class DevicesDaoHappyPath {
 
         @Test
-        fun `should return device by its id`() {
+        fun `should return device by its id`() = runTest {
             // when
             val device = devicesDAO.getDevice(id)
 
@@ -39,7 +41,7 @@ class DevicesDaoTests(
         }
 
         @Test
-        fun `should change devices status and return that device with new status`() {
+        fun `should change devices status and return that device with new status`() = runTest {
             // given
             val device = devicesDAO.getDevice(id)
             assertThat(device.id).isEqualTo(id)
@@ -58,7 +60,7 @@ class DevicesDaoTests(
         }
 
         @Test
-        fun `should return devices id list`() {
+        fun `should return devices id list`() = runTest {
             // given
             val idList = listOf(11, 13, 14)
 
@@ -81,7 +83,7 @@ class DevicesDaoTests(
             val falseId = Int.MAX_VALUE
 
             // when
-            val getDeviceFunc: (id: Int) -> DeviceDB = { devicesDAO.getDevice(it) }
+            val getDeviceFunc: (id: Int) -> DeviceDB = { runBlocking { devicesDAO.getDevice(it) } }
 
             // then
             val exception = assertThrows<NoSuchElementException> { getDeviceFunc(falseId) }
@@ -89,7 +91,7 @@ class DevicesDaoTests(
         }
 
         @Test
-        fun `should return the same device when devices active equals to isActive`() {
+        fun `should return the same device when devices active equals to isActive`() = runTest {
             // given
             val device = devicesDAO.getDevice(id)
             assertThat(device.id).isEqualTo(id)

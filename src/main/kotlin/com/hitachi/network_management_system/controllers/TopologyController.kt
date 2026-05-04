@@ -27,11 +27,11 @@ class TopologyController(
         ResponseEntity(e.message, HttpStatus.NOT_FOUND)
 
     @PatchMapping
-    fun changeDevice(@PathVariable id: Int, @RequestBody state: StateDTO): DeviceDTO =
+    suspend fun changeDevice(@PathVariable id: Int, @RequestBody state: StateDTO): DeviceDTO =
             service.changeDevice(id, state.active)
 
     @GetMapping("/reachable-devices", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
-   fun getReachableDevices(@PathVariable id: Int): Flux<ServerSentEvent<SSEStateResponseDTO>> {
+   suspend fun getReachableDevices(@PathVariable id: Int): Flux<ServerSentEvent<SSEStateResponseDTO>> {
         val initState: Flux<ServerSentEvent<SSEStateResponseDTO>> = service.returnInitState(id)
         val update: Flux<ServerSentEvent<SSEStateResponseDTO>> = service.getStateUpdate(id)
         return Flux.concat(initState, update)

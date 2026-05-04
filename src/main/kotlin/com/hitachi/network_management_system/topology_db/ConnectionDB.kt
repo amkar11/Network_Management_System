@@ -1,14 +1,16 @@
 package com.hitachi.network_management_system.topology_db
 
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
+import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Column
+import org.springframework.data.relational.core.mapping.Table
 
-@Entity
-class ConnectionDB(
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Int? = null,
-    var fromNode: Int,
-    var toNode: Int)
+@Table(value = "connections")
+data class ConnectionDB(
+    @Column("id")
+    @Id val id: Int? = null,
+
+    @Column("from_node")
+    val fromNode: Int,
+
+    @Column("to_node")
+    val toNode: Int)

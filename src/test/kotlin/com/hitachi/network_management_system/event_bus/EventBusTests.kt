@@ -6,8 +6,11 @@ import com.hitachi.network_management_system.daos.IConnectionsDAO
 import com.hitachi.network_management_system.daos.IDevicesDAO
 import com.hitachi.network_management_system.topology_db.ConnectionDB
 import com.hitachi.network_management_system.topology_db.DeviceDB
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -109,16 +112,16 @@ class EventBusTests {
         }
 
         @Test
-        fun `should emit DeviceState REMOVED and ADDED event to all subscribers with all devices turned on`() {
+        fun `should emit DeviceState REMOVED and ADDED event to all subscribers with all devices turned on`() = runTest {
             // given
             val reachableConnections = populateReachableConnectionMap()
             reachableConnections .forEach { println("${it.key}: ${it.value.size}")  }
             for (subscriber in reachableConnections.keys) {
                 val connections = reachableConnections[subscriber]!!
-                every { mockConnectionsDAO.getReachableConnections(subscriber) } returns connections
-                every { mockConnectionsDAO.getAllConnectionsByDeviceId(subscriber) } returns connections
+                coEvery { mockConnectionsDAO.getReachableConnections(subscriber) } returns connections
+                coEvery { mockConnectionsDAO.getAllConnectionsByDeviceId(subscriber) } returns connections
                 for (i in reachableConnections[subscriber]!!.indices) {
-                    every { mockDevicesDAO.getDevice(reachableConnections[subscriber]!![i].toNode) } returns DeviceDB(subscriber, "example", true)
+                    every { runBlocking { mockDevicesDAO.getDevice(reachableConnections[subscriber]!![i].toNode) } } returns DeviceDB(subscriber, "example", true)
                 }
             }
 
@@ -134,19 +137,19 @@ class EventBusTests {
         }
 
         @Test
-        fun `should emit DeviceState REMOVED only for removed devices`() {
+        fun `should emit DeviceState REMOVED only for removed devices`() = runTest {
             // given
             eventBus.subscribe(subscriber)
             val connections = mutableListOf<ConnectionDB>()
             for (i in 0..4) connections.add(ConnectionDB(fromNode = subscriber, toNode = i))
-            every { mockConnectionsDAO.getReachableConnections(subscriber) } returns connections
-            every { mockConnectionsDAO.getAllConnectionsByDeviceId(subscriber) } returns connections
+            coEvery { mockConnectionsDAO.getReachableConnections(subscriber) } returns connections
+            coEvery { mockConnectionsDAO.getAllConnectionsByDeviceId(subscriber) } returns connections
             for (i in connections.indices) {
                 if (i == 3) {
-                    every { mockDevicesDAO.getDevice(connections[i].toNode) } returns DeviceDB(subscriber, "example", false)
+                    coEvery { mockDevicesDAO.getDevice(connections[i].toNode) } returns DeviceDB(subscriber, "example", false)
                     continue
                 }
-                every { mockDevicesDAO.getDevice(connections[i].toNode) } returns DeviceDB(subscriber, "example", true)
+                coEvery { mockDevicesDAO.getDevice(connections[i].toNode) } returns DeviceDB(subscriber, "example", true)
             }
 
             // when

@@ -1,0 +1,11 @@
+CREATE TABLE devices(
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name VARCHAR(255),
+    active BOOLEAN
+);
+
+CREATE TABLE connections(
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    from_node INT,
+    to_node INT
+)

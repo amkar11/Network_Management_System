@@ -46,7 +46,7 @@ class EventBus(
         return subscribers[id] ?: throw IllegalStateException("No subscriber with id: $id")
     }
 
-    fun emitChangesToSubscribers(id: Int, isActive: Boolean): List<Sinks.EmitResult> {
+    suspend fun emitChangesToSubscribers(id: Int, isActive: Boolean): List<Sinks.EmitResult> {
         val subscribers: List<Int> = getSubscribers()
         val eventType: DeviceState = if (isActive) DeviceState.ADDED else DeviceState.REMOVED
 
