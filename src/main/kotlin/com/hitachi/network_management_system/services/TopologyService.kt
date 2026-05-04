@@ -1,5 +1,6 @@
 package com.hitachi.network_management_system.services
 
+import com.hitachi.network_management_system.daos.IConnectionsDAO
 import com.hitachi.network_management_system.dto.DeviceDTO
 import com.hitachi.network_management_system.dto.SSEInitStateResponseDTO
 import com.hitachi.network_management_system.dto.SSEStateResponseDTO
@@ -7,11 +8,7 @@ import com.hitachi.network_management_system.enums.DeviceState
 import com.hitachi.network_management_system.event_bus.EventBus
 import com.hitachi.network_management_system.event_bus.EventBus.Companion.flux
 import com.hitachi.network_management_system.daos.IDevicesDAO
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.hitachi.network_management_system.topology_graph.DevicesCurrentState
 import org.springframework.http.codec.ServerSentEvent
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -24,7 +21,9 @@ import kotlin.concurrent.atomics.fetchAndIncrement
 @OptIn(ExperimentalAtomicApi::class)
 class TopologyService(
     private val devicesDAO: IDevicesDAO,
-    private val eventBus: EventBus
+    private val connectionsDAO: IConnectionsDAO,
+    private val eventBus: EventBus,
+    private val devicesCurrentState: DevicesCurrentState
 ) : ITopologyService {
 
     val atomicInt = AtomicInt(1)
@@ -34,8 +33,10 @@ class TopologyService(
         if (device.active == isActive) {
             return DeviceDTO(device.id as Int, device.name, device.active)
         }
-        eventBus.emitChangesToSubscribers(id, isActive)
         val changedDevice = devicesDAO.changeDevice(id, isActive)
+        eventBus.emitChangesToSubscribers(isActive)
+        val currentDevicesState = connectionsDAO.getDevicesIdList(id)
+        devicesCurrentState.devicesCurrentState[id] = currentDevicesState
         return DeviceDTO(
             id = changedDevice.id as Int,
             name = changedDevice.name,
@@ -43,8 +44,8 @@ class TopologyService(
     }
 
     override suspend fun returnInitState(id: Int): Flux<ServerSentEvent<SSEStateResponseDTO>> {
-        val reachableDevices = devicesDAO.getDevicesIdList(id)
-
+        val reachableDevices = connectionsDAO.getDevicesIdList(id)
+        devicesCurrentState.devicesCurrentState[id] = reachableDevices
         val sseResponse = SSEInitStateResponseDTO(DeviceState.INITIAL_STATE.toString(), reachableDevices)
         val initState = Flux.just(ServerSentEvent.builder<SSEStateResponseDTO>()
             .id("0")

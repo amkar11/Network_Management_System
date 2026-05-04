@@ -22,6 +22,10 @@ class TopologyDbSeederTest(
         val devices = devicesRepository.findAll().toList()
         val connections = connectionsRepository.findAll().toList()
 
+        println(devices)
+        println()
+        println(connections)
+
         // then
         assertThat(devices).hasSize(20)
         assertThat(connections).hasSize(28)

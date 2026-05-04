@@ -1,15 +1,16 @@
 package com.hitachi.network_management_system.daos
 
 import com.hitachi.network_management_system.dto.DeviceDTO
+import com.hitachi.network_management_system.enums.DeviceState
 import com.hitachi.network_management_system.repositories.IDevicesRepository
 import com.hitachi.network_management_system.topology_db.DeviceDB
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Component
 
 @Component
 class DevicesDAO(
     private val devicesRepository: IDevicesRepository,
-    private val connectionsDAO: IConnectionsDAO
 ) : IDevicesDAO {
 
     override suspend fun changeDevice(id: Int, isActive: Boolean): DeviceDB {
@@ -17,12 +18,6 @@ class DevicesDAO(
         if (device.active == isActive) return device
         val updated = device.copy(active = isActive)
         return devicesRepository.save(updated)
-    }
-
-    override suspend fun getDevicesIdList(id: Int): List<Int> {
-        val reachableConnections = connectionsDAO.getReachableConnections(id)
-        val reachableDevices = reachableConnections.map {it.toNode}
-        return reachableDevices
     }
 
     override suspend fun getDevice(id: Int): DeviceDB {
@@ -34,5 +29,27 @@ class DevicesDAO(
     override suspend fun createDevices(devices: List<DeviceDTO>) {
         val devicesDB = devices.map {DeviceDB(null, it.name, it.active)}
         devicesRepository.saveAll(devicesDB).collect()
+    }
+
+    override suspend fun getAllDevices(): List<DeviceDB> {
+        val devices =  devicesRepository.findAll().toList()
+        if (devices.isEmpty()) {
+            throw IllegalStateException("There must be list of devices in the database")
+        }
+        return devices
+    }
+
+    override suspend fun getAddedOrRemovedDevices(
+        devicesOldState: List<Int>,
+        devicesNewState: List<Int>,
+        active: DeviceState
+    ): List<Int> {
+        val devicesOldStateSet = devicesOldState.toSet()
+        val devicesNewStateSet = devicesNewState.toSet()
+        if (active == DeviceState.ADDED) {
+            return (devicesNewStateSet subtract devicesOldStateSet).toList()
+        } else {
+            return (devicesOldStateSet subtract devicesNewStateSet).toList()
+        }
     }
 }

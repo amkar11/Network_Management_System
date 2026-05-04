@@ -5,16 +5,16 @@ import com.hitachi.network_management_system.dto.SSEStateResponseDTO
 import com.hitachi.network_management_system.enums.DeviceState
 import com.hitachi.network_management_system.daos.IConnectionsDAO
 import com.hitachi.network_management_system.daos.IDevicesDAO
-import com.hitachi.network_management_system.topology_db.ConnectionDB
+import com.hitachi.network_management_system.topology_graph.DevicesCurrentState
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Sinks
-import kotlin.collections.forEach
 
 @Component
 class EventBus(
     private val connectionsDAO: IConnectionsDAO,
-    private val devicesDAO: IDevicesDAO
+    private val devicesDAO: IDevicesDAO,
+    private val devicesCurrentState: DevicesCurrentState
 ) {
     private val subscribers: MutableMap<Int, Sinks.Many<SSEStateResponseDTO>> = mutableMapOf()
 
@@ -46,7 +46,7 @@ class EventBus(
         return subscribers[id] ?: throw IllegalStateException("No subscriber with id: $id")
     }
 
-    suspend fun emitChangesToSubscribers(id: Int, isActive: Boolean): List<Sinks.EmitResult> {
+    suspend fun emitChangesToSubscribers(isActive: Boolean): List<Sinks.EmitResult> {
         val subscribers: List<Int> = getSubscribers()
         val eventType: DeviceState = if (isActive) DeviceState.ADDED else DeviceState.REMOVED
 
@@ -54,46 +54,20 @@ class EventBus(
         val eventsList: MutableList<Sinks.EmitResult> = mutableListOf()
 
         for (subscriber in subscribers) {
-            // ADDED requires all connections independent of status, while REMOVED only currently reachable ones
-            val connections: List<ConnectionDB> = if (eventType == DeviceState.ADDED) {
-                connectionsDAO.getAllConnectionsByDeviceId(subscriber)
-            } else {
-                connectionsDAO.getReachableConnections(subscriber)
-            }
+            val devicesNewState = connectionsDAO.getDevicesIdList(subscriber)
 
-            // Maps List<ConnectionDB> to list which contains IDs of reachable devices
-            val reachableDevices: MutableList<Int> = mutableListOf()
-            connections.forEach { reachableDevices.add(it.toNode) }
+            val devicesOldState = devicesCurrentState.devicesCurrentState[subscriber] ?:
+            throw IllegalStateException("Device is already subscribed," +
+                    " so there must be his state in devicesCurrentState")
 
-            if (id !in reachableDevices) continue
+            val addedOrRemovedDevices: List<Int>
+                = devicesDAO.getAddedOrRemovedDevices(devicesOldState, devicesNewState, eventType)
 
-            // To loop only through devices which come after the changed one
-            val index: Int = reachableDevices.indexOf(id)
-
-            // If event is ADDED and there is turned off device prior to the changed one it breaks the loop cause
-            // in spite of device being added it is still unreachable due to turned off device prior to it
-            var broke = false
-            if (eventType == DeviceState.ADDED) {
-                for (i in reachableDevices.indices) {
-                    val device = devicesDAO.getDevice((reachableDevices[i]))
-                    if (!device.active && i < index){
-                        broke = true
-                        break
-                    }
-                }
-            }
-            if (broke) continue
-
-            // Loops through all reachable devices - if some device which comes after the changed one is unreachable - loop is broken
-            // Otherwise, SSEChangedState event gets emitted and Sinks.EmitResult added to the eventsList for testing purposes
-            for (i in index..reachableDevices.lastIndex) {
-                if (i != index && !devicesDAO.getDevice(reachableDevices[i]).active) break
-                val event = publish(subscriber, SSEChangedStateResponseDTO(eventType.toString(), reachableDevices[i]))
+            for (device in addedOrRemovedDevices) {
+                val event = publish(subscriber, SSEChangedStateResponseDTO(eventType.toString(), device))
                 eventsList.add(event)
             }
         }
         return eventsList
     }
-
-
 }
