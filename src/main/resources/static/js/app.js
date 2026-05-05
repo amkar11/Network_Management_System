@@ -17,7 +17,8 @@ gridContainer.addEventListener("click", (e) => __awaiter(void 0, void 0, void 0,
     if (e.target.closest('.device-card .switch-container')) {
         yield ui.toggleDevice(e);
     }
-    else if (e.target.closest('.device-card')) {
+    else if (e.target.closest('.device-card') &&
+        !e.target.classList.contains('switch-container')) {
         ui.toggleSubscription(e);
     }
 }));
@@ -29,7 +30,7 @@ document.addEventListener("click", (e) => {
         ui.closePopup();
     }
 });
-document.addEventListener("DOMContentLoaded", (e) => {
+document.addEventListener("DOMContentLoaded", () => {
     seeder();
 });
 //# sourceMappingURL=app.js.map

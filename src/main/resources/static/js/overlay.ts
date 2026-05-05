@@ -48,7 +48,7 @@ export function drawDeviceCard(device: Device): HTMLDivElement {
     deviceCard.classList.add('device-card');
     deviceCard.dataset.deviceId = device.id.toString();
     const cityNameSpan = document.createElement('span');
-    cityNameSpan.textContent = `${device.name} - id: ${device.id}`;
+    cityNameSpan.textContent = `${device.name} id: ${device.id}`;
     const cityImage = document.createElement('img');
     cityImage.src = Store.imgLinksList[device.id] ??
         throwNullReferenceError("Image was not found in the imgLinksList");

@@ -9,8 +9,9 @@ const ui = new Ui();
 gridContainer.addEventListener("click", async (e) => {
     if ((e.target as HTMLElement).closest('.device-card .switch-container')) {
         await ui.toggleDevice(e);
-    } else if ((e.target as HTMLElement).closest('.device-card')) {
-        ui.toggleSubscription(e);
+    } else if ((e.target as HTMLElement).closest('.device-card') &&
+        !(e.target as HTMLElement).classList.contains('switch-container')) {
+            ui.toggleSubscription(e);
     }
 })
 
@@ -23,6 +24,6 @@ document.addEventListener("click", (e) => {
 
 })
 
-document.addEventListener("DOMContentLoaded", (e) => {
+document.addEventListener("DOMContentLoaded", () => {
     seeder();
 })
