@@ -1,25 +1,24 @@
 import throwNullReferenceError from "./helpers/nullError.js";
-import Ui from "./ui.js"
+import { toggleDevice, toggleSubscription, closePopup, closeOverlayByCross } from "./ui.js"
 import seeder from "./seeder.js"
 
 const gridContainer = document.querySelector(".grid-container") ??
     throwNullReferenceError("No grid container is found")
-const ui = new Ui();
 
 gridContainer.addEventListener("click", async (e) => {
     if ((e.target as HTMLElement).closest('.device-card .switch-container')) {
-        await ui.toggleDevice(e);
+        await toggleDevice(e);
     } else if ((e.target as HTMLElement).closest('.device-card') &&
         !(e.target as HTMLElement).classList.contains('switch-container')) {
-            ui.toggleSubscription(e);
+            toggleSubscription(e);
     }
 })
 
 document.addEventListener("click", (e) => {
     if ((e.target as HTMLElement).closest('#overlay-cross')) {
-        ui.closeOverlayByCross();
+        closeOverlayByCross();
     } else if ((e.target as HTMLElement).closest('#popup-cross')) {
-        ui.closePopup();
+        closePopup();
     }
 
 })

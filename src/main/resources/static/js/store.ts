@@ -12,7 +12,6 @@ class Store {
              'media/rzeszow.jpg'],
          eventSource: null as EventSource | null
     }
-    private subscribers = new Set<Function>();
 
      // devicesList
      get devicesList() {
@@ -57,19 +56,6 @@ class Store {
     set eventSource(newEventSource: EventSource | null) {
         this.state.eventSource = newEventSource;
     }
-
-    // Subscribe and notify
-    subscribe(callback: Function) {
-         this.subscribers.add(callback);
-         callback();
-         return () => this.subscribers.delete(callback);
-    }
-    private notify() {
-         for (const sub of this.subscribers) {
-            sub();
-         }
-    }
-
 }
 
 export default new Store();

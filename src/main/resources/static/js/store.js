@@ -12,7 +12,6 @@ class Store {
                 'media/rzeszow.jpg'],
             eventSource: null
         };
-        this.subscribers = new Set();
     }
     // devicesList
     get devicesList() {
@@ -48,17 +47,6 @@ class Store {
     }
     set eventSource(newEventSource) {
         this.state.eventSource = newEventSource;
-    }
-    // Subscribe and notify
-    subscribe(callback) {
-        this.subscribers.add(callback);
-        callback();
-        return () => this.subscribers.delete(callback);
-    }
-    notify() {
-        for (const sub of this.subscribers) {
-            sub();
-        }
     }
 }
 export default new Store();

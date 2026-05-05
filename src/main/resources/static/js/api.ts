@@ -6,16 +6,15 @@ const baseUrl = 'http://localhost:8080/devices/'
 
 export function createSseConnection(deviceId: number) {
     const getUrl = baseUrl + `${deviceId}/reachable-devices`;
-    const sse = new EventSource(getUrl);
-    Store.eventSource = sse;
-    sse.addEventListener("INITIAL_STATE", (e) => {
+    Store.eventSource = new EventSource(getUrl);
+    Store.eventSource.addEventListener("INITIAL_STATE", (e) => {
         drawInitialState(e.data)
     })
-    sse.addEventListener("update", (e) => {
+    Store.eventSource.addEventListener("update", (e) => {
         addOrDeleteDeviceCard(e.data)
         console.log(e.data)
     })
-    sse.onerror = (error) => {
+    Store.eventSource.onerror = (error) => {
         console.error('Event source failed: ', error);
     }
 }

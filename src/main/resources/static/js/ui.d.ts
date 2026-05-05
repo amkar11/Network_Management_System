@@ -1,8 +1,6 @@
-export default class Ui {
-    toggleDevice(e: Event): Promise<void>;
-    toggleSubscription(e: Event): void;
-    closeOverlayByCross(): void;
-    openOrUpdatePopup(text: string): void;
-    closePopup(): void;
-}
+export declare function toggleDevice(e: Event): Promise<void>;
+export declare function toggleSubscription(e: Event): void;
+export declare function closeOverlayByCross(): void;
+export declare function openOrUpdatePopup(text: string): void;
+export declare function closePopup(): void;
 //# sourceMappingURL=ui.d.ts.map

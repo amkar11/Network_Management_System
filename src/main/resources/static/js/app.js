@@ -9,25 +9,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 var _a;
 import throwNullReferenceError from "./helpers/nullError.js";
-import Ui from "./ui.js";
+import { toggleDevice, toggleSubscription, closePopup, closeOverlayByCross } from "./ui.js";
 import seeder from "./seeder.js";
 const gridContainer = (_a = document.querySelector(".grid-container")) !== null && _a !== void 0 ? _a : throwNullReferenceError("No grid container is found");
-const ui = new Ui();
 gridContainer.addEventListener("click", (e) => __awaiter(void 0, void 0, void 0, function* () {
     if (e.target.closest('.device-card .switch-container')) {
-        yield ui.toggleDevice(e);
+        yield toggleDevice(e);
     }
     else if (e.target.closest('.device-card') &&
         !e.target.classList.contains('switch-container')) {
-        ui.toggleSubscription(e);
+        toggleSubscription(e);
     }
 }));
 document.addEventListener("click", (e) => {
     if (e.target.closest('#overlay-cross')) {
-        ui.closeOverlayByCross();
+        closeOverlayByCross();
     }
     else if (e.target.closest('#popup-cross')) {
-        ui.closePopup();
+        closePopup();
     }
 });
 document.addEventListener("DOMContentLoaded", () => {
