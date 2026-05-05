@@ -2,31 +2,15 @@ package com.hitachi.network_management_system.daos
 
 import com.hitachi.network_management_system.dto.ConnectionDTO
 import com.hitachi.network_management_system.repositories.IConnectionsRepository
-import com.hitachi.network_management_system.repositories.IDevicesRepository
 import com.hitachi.network_management_system.topology_db.ConnectionDB
-import com.hitachi.network_management_system.topology_db.DeviceDB
-import com.hitachi.network_management_system.topology_graph.TopologyGraph
-import com.hitachi.network_management_system.topology_graph.TopologyGraph.Companion.getReachableConnections
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 
-@Component
+@Service
 class ConnectionsDAO(
-    private val devicesRepository: IDevicesRepository,
-    private val connectionsRepository: IConnectionsRepository,
-    private val devicesDAO: DevicesDAO
-) : IConnectionsDAO {
-
-    override suspend fun getReachableConnections(id: Int): List<DeviceDB> {
-        val devices = devicesRepository.findAll().toList()
-        val connections = getAllConnections()
-        val topologyGraph = TopologyGraph(devices.size, devicesDAO)
-        topologyGraph.constructTopologyGraph(connections)
-        val reachableConnections = topologyGraph.getReachableConnections(id)
-        return reachableConnections
-    }
-
+    val connectionsRepository: IConnectionsRepository
+)  : IConnectionsDAO {
     override suspend fun getAllConnections(): List<ConnectionDB> {
         val connections = connectionsRepository.findAll().toList()
         if (connections.isEmpty()) {
@@ -36,13 +20,7 @@ class ConnectionsDAO(
     }
 
     override suspend fun createConnections(connections: List<ConnectionDTO>) {
-        val connectionsDB = connections.map {ConnectionDB(id = null, fromNode = it.from, toNode = it.to)}
+        val connectionsDB = connections.map { ConnectionDB(id = null, fromNode = it.from, toNode = it.to) }
         connectionsRepository.saveAll(connectionsDB).collect()
-    }
-
-    override suspend fun getDevicesIdList(id: Int): List<Int> {
-        val reachableConnections = getReachableConnections(id)
-        val reachableDevices = reachableConnections.map {it.id as Int}
-        return reachableDevices
     }
 }

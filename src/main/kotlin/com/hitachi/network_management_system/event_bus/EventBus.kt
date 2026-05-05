@@ -3,8 +3,7 @@ package com.hitachi.network_management_system.event_bus
 import com.hitachi.network_management_system.dto.SSEChangedStateResponseDTO
 import com.hitachi.network_management_system.dto.SSEStateResponseDTO
 import com.hitachi.network_management_system.enums.DeviceState
-import com.hitachi.network_management_system.daos.IConnectionsDAO
-import com.hitachi.network_management_system.daos.IDevicesDAO
+import com.hitachi.network_management_system.services.IDevicesService
 import com.hitachi.network_management_system.topology_graph.DevicesCurrentState
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
@@ -12,8 +11,7 @@ import reactor.core.publisher.Sinks
 
 @Component
 class EventBus(
-    private val connectionsDAO: IConnectionsDAO,
-    private val devicesDAO: IDevicesDAO,
+    private val devicesService: IDevicesService,
     private val devicesCurrentState: DevicesCurrentState
 ) {
     private val subscribers: MutableMap<Int, Sinks.Many<SSEStateResponseDTO>> = mutableMapOf()
@@ -54,19 +52,22 @@ class EventBus(
         val eventsList: MutableList<Sinks.EmitResult> = mutableListOf()
 
         for (subscriber in subscribers) {
-            val devicesNewState = connectionsDAO.getDevicesIdList(subscriber)
+            val devicesNewState = devicesService.getDevicesIdList(subscriber)
 
             val devicesOldState = devicesCurrentState.devicesCurrentState[subscriber] ?:
             throw IllegalStateException("Device is already subscribed," +
                     " so there must be his state in devicesCurrentState")
 
             val addedOrRemovedDevices: List<Int>
-                = devicesDAO.getAddedOrRemovedDevices(devicesOldState, devicesNewState, eventType)
+                = devicesService.getAddedOrRemovedDevices(devicesOldState, devicesNewState, eventType)
 
             for (device in addedOrRemovedDevices) {
                 val event = publish(subscriber, SSEChangedStateResponseDTO(eventType.toString(), device))
                 eventsList.add(event)
             }
+
+            devicesCurrentState.devicesCurrentState[subscriber] = devicesNewState
+
         }
         return eventsList
     }
