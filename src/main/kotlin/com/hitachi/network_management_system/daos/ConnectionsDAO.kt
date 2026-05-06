@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service
 class ConnectionsDAO(
     val connectionsRepository: IConnectionsRepository
 )  : IConnectionsDAO {
+
+
     override suspend fun getAllConnections(): List<ConnectionDB> {
         val connections = connectionsRepository.findAll().toList()
         if (connections.isEmpty()) {

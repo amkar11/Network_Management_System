@@ -30,8 +30,6 @@ dependencies {
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    // implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:3.0.3")
-    // implementation("org.springframework.boot:spring-boot-h2console")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 
     runtimeOnly("io.r2dbc:r2dbc-h2")

@@ -9,7 +9,7 @@ class TopologyGraph(
     val vertices: Int,
     val devicesDAO: DevicesDAO
 ) {
-    private val adjacencyList: ArrayList<ArrayList<Edge>> = ArrayList(vertices)
+    val adjacencyList: ArrayList<ArrayList<Edge>> = ArrayList(vertices)
 
     init {
         for (i in 0..<vertices) {
@@ -22,7 +22,7 @@ class TopologyGraph(
             adjacencyList[source.id].add(Edge(source, destination))
             adjacencyList[destination.id].add(Edge(destination, source))
         } else {
-            throw IllegalStateException("Id of the some device is somehow null ")
+            throw IllegalStateException("Id of some device is somehow null ")
         }
     }
 

@@ -6,7 +6,7 @@ import com.hitachi.network_management_system.dto.SSEStateResponseDTO
 import com.hitachi.network_management_system.enums.DeviceState
 import com.hitachi.network_management_system.event_bus.EventBus
 import com.hitachi.network_management_system.event_bus.EventBus.Companion.flux
-import com.hitachi.network_management_system.daos.DevicesDAO
+import com.hitachi.network_management_system.daos.IDevicesDAO
 import com.hitachi.network_management_system.topology_graph.DevicesCurrentState
 import org.springframework.http.codec.ServerSentEvent
 import org.springframework.stereotype.Service
@@ -19,7 +19,7 @@ import kotlin.concurrent.atomics.fetchAndIncrement
 @Service
 @OptIn(ExperimentalAtomicApi::class)
 class TopologyService(
-    private val devicesDao: DevicesDAO,
+    private val devicesDao: IDevicesDAO,
     private  val devicesService: IDevicesService,
     private val eventBus: EventBus,
     private val devicesCurrentState: DevicesCurrentState
@@ -41,7 +41,7 @@ class TopologyService(
     }
 
     override suspend fun returnInitState(id: Int): Flux<ServerSentEvent<SSEStateResponseDTO>> {
-        val reachableDevices = devicesService.getDevicesIdList(id)
+        val reachableDevices = devicesService.getReachableDevices(id)
         devicesCurrentState.devicesCurrentState[id] = reachableDevices
         val sseResponse = SSEInitStateResponseDTO(DeviceState.INITIAL_STATE.toString(), reachableDevices)
         val initState = Flux.just(ServerSentEvent.builder<SSEStateResponseDTO>()

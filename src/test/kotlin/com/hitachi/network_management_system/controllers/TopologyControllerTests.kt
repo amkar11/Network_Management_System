@@ -7,19 +7,19 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.TestConstructor
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.get
-import org.springframework.test.web.servlet.patch
+import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.reactive.server.returnResult
+import reactor.test.StepVerifier
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureWebTestClient
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class TopologyControllerTests(
-    private val mockMvc: MockMvc,
+    private val webTestClient: WebTestClient,
     private val objectMapper: ObjectMapper
 ) {
 
@@ -40,49 +40,46 @@ class TopologyControllerTests(
             val deviceDto = DeviceDTO(id = deviceId, name="Warszawa", active = active)
 
             // when
-            val performPatchRequest = mockMvc.patch(baseUrl) {
-                contentType = MediaType.APPLICATION_JSON
-                content = objectMapper.writeValueAsString(stateDto)
-            }
+            val performPatchRequest = webTestClient.patch()
+                .uri(baseUrl)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(objectMapper.writeValueAsString(stateDto))
+                .exchange()
 
             // then
             performPatchRequest
-                .andDo { print() }
-                .andExpect {
-                    status { isOk() }
-                    content {
-                        contentType(MediaType.APPLICATION_JSON)
-                        json(objectMapper.writeValueAsString(deviceDto))
-                    }
-                }
+                .expectStatus().isOk
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody().json(objectMapper.writeValueAsString(deviceDto))
         }
 
         @Test
         fun `should return OK and initial state`() {
             // given
-            val sseString =
-                """
-                id:0
-                event:INITIAL_STATE
-                data:{"type":"INITIAL_STATE","deviceIds":[1,2,3,5]}
-                retry:1000
-                
-                
-                """.trimIndent()
+            val deviceIds = listOf(1,2,3,5,8,9,10,12,6,11,7,13,14,4,15,16,17,18,19)
 
             // when
-            val performGetRequest = mockMvc.get(getUrl)
+            val performGetRequest = webTestClient.get()
+                .uri(getUrl)
+                .accept(MediaType.TEXT_EVENT_STREAM)
+                .exchange()
 
             // then
-            performGetRequest
-                .andDo { print() }
-                .andExpect {
-                    status { isOk() }
-                    content {
-                        contentType(MediaType.TEXT_EVENT_STREAM)
-                        string(sseString)
-                    }
+            val getRequestResult = performGetRequest
+                .expectStatus().isOk
+                .expectHeader().contentTypeCompatibleWith(MediaType.TEXT_EVENT_STREAM)
+                .returnResult<String>()
+
+            StepVerifier.create(getRequestResult.responseBody)
+                .assertNext { chunk ->
+                    println(chunk)
+
+                    assert(chunk.contains("INITIAL_STATE"))
+                    assert(chunk.contains("deviceIds"))
+                    assert(chunk.contains(deviceIds.joinToString(",")))
                 }
+                .thenCancel()
+                .verify()
             }
         }
 
@@ -102,20 +99,20 @@ class TopologyControllerTests(
             val stateDto = StateDTO(active = active)
 
             // when/then
-            mockMvc.patch(baseInvalidUrl) {
-                contentType = MediaType.APPLICATION_JSON
-                content = objectMapper.writeValueAsString(stateDto)
-            }
-                .andDo { print() }
-                .andExpect { status { isNotFound() } }
+            webTestClient.patch().uri(baseInvalidUrl)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(objectMapper.writeValueAsString(stateDto))
+                .exchange()
+                .expectStatus().isNotFound
         }
 
         @Test
         fun `should return NOT FOUND while trying to subscribe to non-existing device`() {
             // when/then
-            mockMvc.get(getInvalidUrl)
-                .andDo { print() }
-                .andExpect { status { isNotFound() } }
+            webTestClient.get()
+                .uri(getInvalidUrl)
+                .exchange()
+                .expectStatus().isNotFound
         }
     }
 }

@@ -23,7 +23,11 @@ class TopologyController(
     private val service: ITopologyService,
 ) {
     @ExceptionHandler(NoSuchElementException::class)
-        fun handleNotFound(e: NoSuchElementException): ResponseEntity<String> =
+        fun handleNoSuchElementException(e: NoSuchElementException): ResponseEntity<String> =
+        ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+
+    @ExceptionHandler(ArrayIndexOutOfBoundsException::class)
+    fun handleArrayIndexOutOfBoundsException(e: ArrayIndexOutOfBoundsException): ResponseEntity<String> =
         ResponseEntity(e.message, HttpStatus.NOT_FOUND)
 
     @PatchMapping

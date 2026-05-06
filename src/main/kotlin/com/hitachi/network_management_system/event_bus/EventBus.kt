@@ -29,10 +29,8 @@ class EventBus(
     }
 
     fun subscribe(id: Int) {
-        if (!subscribers.containsKey(id)) {
-            val sink = createSink()
-            subscribers[id] = sink
-        }
+        val sink = createSink()
+        subscribers[id] = sink
     }
 
     fun createSink(): Sinks.Many<SSEStateResponseDTO> {
@@ -52,7 +50,7 @@ class EventBus(
         val eventsList: MutableList<Sinks.EmitResult> = mutableListOf()
 
         for (subscriber in subscribers) {
-            val devicesNewState = devicesService.getDevicesIdList(subscriber)
+            val devicesNewState = devicesService.getReachableDevices(subscriber)
 
             val devicesOldState = devicesCurrentState.devicesCurrentState[subscriber] ?:
             throw IllegalStateException("Device is already subscribed," +

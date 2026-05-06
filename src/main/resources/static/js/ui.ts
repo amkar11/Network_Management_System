@@ -61,7 +61,7 @@ import { clearOverlay } from "./overlay.js";
             return;
         }
 
-        if (Store.eventSource !== null || deviceId !== Store.currentSubscriptionId) {
+        if (deviceId !== Store.currentSubscriptionId) {
             closeSseConnection()
             clearOverlay();
             Store.currentSubscriptionId = null;

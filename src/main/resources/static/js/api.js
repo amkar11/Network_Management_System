@@ -13,6 +13,7 @@ const baseUrl = 'http://localhost:8080/devices/';
 export function createSseConnection(deviceId) {
     const getUrl = baseUrl + `${deviceId}/reachable-devices`;
     Store.eventSource = new EventSource(getUrl);
+    console.log("New event source created");
     Store.eventSource.addEventListener("INITIAL_STATE", (e) => {
         drawInitialState(e.data);
     });

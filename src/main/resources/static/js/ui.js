@@ -55,7 +55,7 @@ export function toggleSubscription(e) {
         openOrUpdatePopup(`You unsubscribed from device ${deviceId}`);
         return;
     }
-    if (Store.eventSource !== null || deviceId !== Store.currentSubscriptionId) {
+    if (deviceId !== Store.currentSubscriptionId) {
         closeSseConnection();
         clearOverlay();
         Store.currentSubscriptionId = null;
