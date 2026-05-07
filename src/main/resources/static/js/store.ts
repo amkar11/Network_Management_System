@@ -10,10 +10,10 @@ class Store {
              'media/bialystok.jpg', 'media/gdynia.jpg', 'media/czestochowa.jpg', 'media/radom.jpg', 'media/torun.jpg',
              'media/sosnowiec.jpg', 'media/kielce.jpg', 'media/gliwice.jpg', 'media/zabrze.jpg', 'media/olsztyn.jpg',
              'media/rzeszow.jpg'],
-         eventSource: null as EventSource | null
+         eventSource: null as EventSource | null,
+         isPopupSwitchTurnedOff: true
     }
 
-     // devicesList
      get devicesList() {
          return this.state.devicesList;
      }
@@ -25,37 +25,39 @@ class Store {
         this.devicesList.push(device);
     }
 
-    //imgLinksList
     get imgLinksList() {
          return this.state.imgLinksList;
     }
 
-
-    // currentSubscriptionId
      get currentSubscriptionId() {
          return this.state.currentSubscriptionId;
      }
-
      set currentSubscriptionId(newId: number | null) {
         this.state.currentSubscriptionId = newId;
      }
 
-     // isConnectionsOverlayActive
     get isConnectionsOverlayActive() {
          return this.state.isConnectionsOverlayActive;
     }
-
     set isConnectionsOverlayActive(isActive: boolean) {
          this.state.isConnectionsOverlayActive = isActive;
     }
 
-    // eventSource
     get eventSource() {
          return this.state.eventSource;
     }
     set eventSource(newEventSource: EventSource | null) {
         this.state.eventSource = newEventSource;
     }
+
+    get isPopupSwitchTurnedOff() {
+         return this.state.isPopupSwitchTurnedOff;
+    }
+    set isPopupSwitchTurnedOff(newState: boolean) {
+         this.state.isPopupSwitchTurnedOff = newState;
+    }
+
+
 }
 
 export default new Store();

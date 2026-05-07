@@ -7,6 +7,11 @@ export default function seeder() {
     const imgLinks = Store.imgLinksList
     const gridContainer = document.querySelector(".grid-container")
         ?? throwNullReferenceError('Grid container is not found');
+    let devices: Device[] = [];
+    if (sessionStorage.getItem('devices') !== null) {
+        devices = JSON.parse(sessionStorage.getItem('devices') as string) as Device[];
+    }
+
 
     for (let i = 0; i < topology.devices.length; i++) {
         // device-card div
@@ -35,9 +40,19 @@ export default function seeder() {
         const switchBackground = document.createElement("div");
         switchBackground.classList.add("switch-background");
         const backgroundSpan = document.createElement("span");
-        backgroundSpan.textContent = 'Turned on';
         const switchButton = document.createElement("div");
         switchButton.classList.add("switch");
+        backgroundSpan.textContent = "Turned on";
+        if (devices.length > 0) {
+            const device = devices[i] as Device;
+            backgroundSpan.textContent = (device.active) ? 'Turned on' : 'Turned off';
+            if (!device.active) {
+                switchButton.classList.add('switch-turned-off');
+                deviceCard.classList.add('device-card-turned-off');
+                switchContainer.classList.add('switch-background-span-turned-off');
+            }
+            Store.devicesList[i]!!.active = device.active;
+        }
 
         // Assemble card
         switchBackground.append(backgroundSpan)

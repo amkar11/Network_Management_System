@@ -42,4 +42,4 @@ export async function performPatchRequest(deviceId: number, active: boolean): Pr
         throw new Error(`Unable to performPatchRequest on device with id: ${deviceId}`);
     }
     return await response.json() as Device;
-    }
+}

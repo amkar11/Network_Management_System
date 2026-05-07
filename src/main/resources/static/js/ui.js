@@ -35,6 +35,7 @@ export function toggleDevice(e) {
         else {
             openOrUpdatePopup(`You turned on the device with id ${deviceId}`);
         }
+        sessionStorage.setItem('devices', JSON.stringify(Store.devicesList));
     });
 }
 export function toggleSubscription(e) {
@@ -46,22 +47,15 @@ export function toggleSubscription(e) {
         return;
     }
     const overlay = (_d = document.querySelector('.connections-overlay')) !== null && _d !== void 0 ? _d : throwNullReferenceError(`Connections overlay not found`);
-    if (deviceId === Store.currentSubscriptionId) {
-        closeSseConnection();
-        clearOverlay();
-        Store.isConnectionsOverlayActive = false;
-        Store.currentSubscriptionId = null;
-        overlay.classList.remove('connections-overlay-active');
-        openOrUpdatePopup(`You unsubscribed from device ${deviceId}`);
-        return;
-    }
-    if (deviceId !== Store.currentSubscriptionId) {
+    if (deviceId !== Store.currentSubscriptionId || deviceId === Store.currentSubscriptionId) {
         closeSseConnection();
         clearOverlay();
         Store.currentSubscriptionId = null;
         Store.isConnectionsOverlayActive = false;
         overlay.classList.remove('connections-overlay-active');
         openOrUpdatePopup(`You unsubscribed from device ${deviceId}`);
+        if (deviceId === Store.currentSubscriptionId)
+            return;
     }
     createSseConnection(deviceId);
     Store.currentSubscriptionId = deviceId;
@@ -83,6 +77,8 @@ export function closeOverlayByCross() {
 }
 export function openOrUpdatePopup(text) {
     var _a, _b;
+    if (!Store.isPopupSwitchTurnedOff)
+        return;
     const popup = (_a = document.querySelector('.popup-wrapper')) !== null && _a !== void 0 ? _a : throwNullReferenceError('Popup wrapper is not found');
     const span = (_b = popup.querySelector('span#popup-text')) !== null && _b !== void 0 ? _b : throwNullReferenceError('Popup span is not found');
     if (popup.classList.contains('popup-active')) {
@@ -92,11 +88,16 @@ export function openOrUpdatePopup(text) {
     popup.classList.add('popup-active');
     span.textContent = text;
 }
-export function closePopup() {
-    var _a, _b;
+export function closePopup(element) {
+    var _a, _b, _c;
     const popup = (_a = document.querySelector('.popup-wrapper')) !== null && _a !== void 0 ? _a : throwNullReferenceError('Popup wrapper is not found');
     const span = (_b = popup.querySelector('span#popup-text')) !== null && _b !== void 0 ? _b : throwNullReferenceError('Popup span is not found');
     span.textContent = '';
     popup.classList.remove('popup-active');
+    if (element === document.querySelector('.popup-switch-container')) {
+        const popupSwitch = (_c = document.querySelector('.popup-switch')) !== null && _c !== void 0 ? _c : throwNullReferenceError('Popup switch is not found');
+        popupSwitch.classList.toggle('popup-switch-turned-off');
+        Store.isPopupSwitchTurnedOff = !Store.isPopupSwitchTurnedOff;
+    }
 }
 //# sourceMappingURL=ui.js.map

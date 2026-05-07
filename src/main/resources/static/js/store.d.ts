@@ -11,6 +11,8 @@ declare class Store {
     set isConnectionsOverlayActive(isActive: boolean);
     get eventSource(): EventSource | null;
     set eventSource(newEventSource: EventSource | null);
+    get isPopupSwitchTurnedOff(): boolean;
+    set isPopupSwitchTurnedOff(newState: boolean);
 }
 declare const _default: Store;
 export default _default;

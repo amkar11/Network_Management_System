@@ -23,16 +23,59 @@ body {
 .nav-container {
     width: 100%;
     height: 10vh;
-    background-color: var(--royal-blue);
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    background-color: var(--royal-blue);
 }
 
 .nav-container span {
     font-family: "Audiowide", sans-serif;
     user-select: none;
     font-size: 2rem;
+}
+
+.popup-switch-container {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    height: 30px;
+    width: 80px;
+    cursor: pointer;
+}
+
+.popup-switch-container:hover::before {
+    height: 30px;
+    width: fit-content;
+    padding: 5px;
+    content: "Toggle popup";
+    text-wrap: nowrap;
+    position: absolute;
+    background-color: transparent;
+    font-size: 1.1rem;
+    top: 0;
+    left: 0;
+    transform: translateX(-120%);
+}
+
+.popup-switch-background {
+    width: 100%;
+    height: 100%;
+    background-color: var(--lavender);
+    float: left;
+}
+
+.popup-switch {
+    width: 33.333%;
+    height: 100%;
+    background-color: var(--frozen-lake);
+    opacity: .99;
+}
+
+.popup-switch-turned-off {
+    transform: translateX(200%);
+    background-color: var(--switch-turned-off);
 }
 
 .grid-container {
@@ -118,7 +161,7 @@ body {
     width: 100%;
     min-height: 40vh;
     height: auto;
-    border-top: 10 px solid var(--space-indigo);
+    border-top: 4px solid rgb(5 33 168);
     background-color: var(--royal-blue);
     text-align: center;
     padding: 20px 10px;

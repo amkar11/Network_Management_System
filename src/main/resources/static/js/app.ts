@@ -15,12 +15,14 @@ gridContainer.addEventListener("click", async (e) => {
 })
 
 document.addEventListener("click", (e) => {
-    if ((e.target as HTMLElement).closest('#overlay-cross')) {
-        closeOverlayByCross();
-    } else if ((e.target as HTMLElement).closest('#popup-cross')) {
-        closePopup();
-    }
+    const element = e.target as HTMLElement;
 
+    if (element.closest('#overlay-cross')) {
+        closeOverlayByCross();
+    } else if (element.closest('#popup-cross') ||
+            element.closest('.popup-switch-container')) {
+        closePopup(element.closest('.popup-switch-container') as Element);
+    }
 })
 
 document.addEventListener("DOMContentLoaded", () => {

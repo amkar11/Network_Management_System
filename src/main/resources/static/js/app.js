@@ -22,11 +22,13 @@ gridContainer.addEventListener("click", (e) => __awaiter(void 0, void 0, void 0,
     }
 }));
 document.addEventListener("click", (e) => {
-    if (e.target.closest('#overlay-cross')) {
+    const element = e.target;
+    if (element.closest('#overlay-cross')) {
         closeOverlayByCross();
     }
-    else if (e.target.closest('#popup-cross')) {
-        closePopup();
+    else if (element.closest('#popup-cross') ||
+        element.closest('.popup-switch-container')) {
+        closePopup(element.closest('.popup-switch-container'));
     }
 });
 document.addEventListener("DOMContentLoaded", () => {
