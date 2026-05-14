@@ -1,9 +1,13 @@
 import topology from '../topology.json' with {type: 'json'}
 import Device from './models/device.js'
 import Store from './store.js'
+import {getAllDevices} from "./api.js";
 import throwNullReferenceError from './helpers/nullError.js'
 
-export default function seeder() {
+// By default, devices are fetched from topology
+// I will try to fetch devices from API
+
+export default async function seeder() {
     const imgLinks = Store.imgLinksList
     const gridContainer = document.querySelector(".grid-container")
         ?? throwNullReferenceError('Grid container is not found');
@@ -11,6 +15,7 @@ export default function seeder() {
     if (sessionStorage.getItem('devices') !== null) {
         devices = JSON.parse(sessionStorage.getItem('devices') as string) as Device[];
     }
+    let devicesApi = await getAllDevices()
 
 
     for (let i = 0; i < topology.devices.length; i++) {

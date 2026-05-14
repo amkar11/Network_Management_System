@@ -27,6 +27,16 @@ export function closeSseConnection() {
     }
 }
 
+export async function getAllDevices() : Promise<Device[]> {
+    const response = await fetch(baseUrl, {
+        method: 'GET',
+    })
+    if (!response.ok) {
+        throw new Error("Unable to get all devices")
+    }
+    return await response.json()
+}
+
 export async function performPatchRequest(deviceId: number, active: boolean): Promise<Device> {
     const body = {
         active: active,
@@ -41,5 +51,7 @@ export async function performPatchRequest(deviceId: number, active: boolean): Pr
     if (!response.ok) {
         throw new Error(`Unable to performPatchRequest on device with id: ${deviceId}`);
     }
-    return await response.json() as Device;
+    return await response.json()
 }
+
+

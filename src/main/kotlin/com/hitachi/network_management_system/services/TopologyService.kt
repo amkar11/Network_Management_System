@@ -7,6 +7,7 @@ import com.hitachi.network_management_system.enums.DeviceState
 import com.hitachi.network_management_system.event_bus.EventBus
 import com.hitachi.network_management_system.event_bus.EventBus.Companion.flux
 import com.hitachi.network_management_system.daos.IDevicesDAO
+import com.hitachi.network_management_system.topology_db.DeviceDB
 import com.hitachi.network_management_system.topology_graph.DevicesCurrentState
 import org.springframework.http.codec.ServerSentEvent
 import org.springframework.stereotype.Service
@@ -38,6 +39,10 @@ class TopologyService(
             id = changedDevice.id as Int,
             name = changedDevice.name,
             active = changedDevice.active)
+    }
+
+    override suspend fun getAllDevices(): List<DeviceDB> {
+        return devicesDao.getAllDevices()
     }
 
     override suspend fun returnInitState(id: Int): Flux<ServerSentEvent<SSEStateResponseDTO>> {

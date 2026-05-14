@@ -25,6 +25,6 @@ document.addEventListener("click", (e) => {
     }
 })
 
-document.addEventListener("DOMContentLoaded", () => {
-    seeder();
+document.addEventListener("DOMContentLoaded", async () => {
+    await seeder();
 })

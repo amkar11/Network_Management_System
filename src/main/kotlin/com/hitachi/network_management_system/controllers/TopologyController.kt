@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Flux
 
 @RestController
-@RequestMapping("/devices/{id}")
+@RequestMapping("/devices")
 class TopologyController(
     private val service: ITopologyService,
 ) {
@@ -30,11 +30,14 @@ class TopologyController(
     fun handleArrayIndexOutOfBoundsException(e: ArrayIndexOutOfBoundsException): ResponseEntity<String> =
         ResponseEntity(e.message, HttpStatus.NOT_FOUND)
 
-    @PatchMapping
+    @GetMapping
+    suspend fun getAllDevices() = service.getAllDevices()
+
+    @PatchMapping("/{id}")
     suspend fun changeDevice(@PathVariable id: Int, @RequestBody state: StateDTO): DeviceDTO =
             service.changeDevice(id, state.active)
 
-    @GetMapping("/reachable-devices", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
+    @GetMapping("/{id}/reachable-devices", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
    suspend fun getReachableDevices(@PathVariable id: Int): Flux<ServerSentEvent<SSEStateResponseDTO>> {
         val initState: Flux<ServerSentEvent<SSEStateResponseDTO>> = service.returnInitState(id)
         val update: Flux<ServerSentEvent<SSEStateResponseDTO>> = service.getStateUpdate(id)

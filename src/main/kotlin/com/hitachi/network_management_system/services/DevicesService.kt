@@ -3,6 +3,7 @@ package com.hitachi.network_management_system.services
 import com.hitachi.network_management_system.enums.DeviceState
 import com.hitachi.network_management_system.daos.ConnectionsDAO
 import com.hitachi.network_management_system.daos.DevicesDAO
+import com.hitachi.network_management_system.topology_db.DeviceDB
 import com.hitachi.network_management_system.topology_graph.TopologyGraph
 import com.hitachi.network_management_system.topology_graph.TopologyGraph.Companion.getReachableConnections
 import org.springframework.stereotype.Component
