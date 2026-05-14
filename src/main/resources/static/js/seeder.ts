@@ -1,33 +1,22 @@
-import topology from '../topology.json' with {type: 'json'}
-import Device from './models/device.js'
 import Store from './store.js'
-import {getAllDevices} from "./api.js";
+import { getAllDevices } from "./api.js";
 import throwNullReferenceError from './helpers/nullError.js'
-
-// By default, devices are fetched from topology
-// I will try to fetch devices from API
 
 export default async function seeder() {
     const imgLinks = Store.imgLinksList
     const gridContainer = document.querySelector(".grid-container")
         ?? throwNullReferenceError('Grid container is not found');
-    let devices: Device[] = [];
-    if (sessionStorage.getItem('devices') !== null) {
-        devices = JSON.parse(sessionStorage.getItem('devices') as string) as Device[];
-    }
-    let devicesApi = await getAllDevices()
+    let devices = await getAllDevices();
 
-
-    for (let i = 0; i < topology.devices.length; i++) {
+    for (let i = 0; i < devices.length; i++) {
         // device-card div
         const deviceCard = document.createElement("div");
         deviceCard.classList.add("device-card");
         deviceCard.dataset.deviceId = i.toString();
 
         // Cast to Device class
-        if (topology.devices[i] === undefined)
+        const device = devices[i] ??
             throwNullReferenceError(`No device found with id ${i}`);
-        const device = (topology.devices[i] as Device)
         Store.addDevice(device)
 
         // City name span
@@ -48,16 +37,14 @@ export default async function seeder() {
         const switchButton = document.createElement("div");
         switchButton.classList.add("switch");
         backgroundSpan.textContent = "Turned on";
-        if (devices.length > 0) {
-            const device = devices[i] as Device;
-            backgroundSpan.textContent = (device.active) ? 'Turned on' : 'Turned off';
-            if (!device.active) {
-                switchButton.classList.add('switch-turned-off');
-                deviceCard.classList.add('device-card-turned-off');
-                switchContainer.classList.add('switch-background-span-turned-off');
-            }
-            Store.devicesList[i]!!.active = device.active;
+        backgroundSpan.textContent = (device.active) ? 'Turned on' : 'Turned off';
+        if (!device.active) {
+            switchButton.classList.add('switch-turned-off');
+            deviceCard.classList.add('device-card-turned-off');
+            backgroundSpan.classList.add('switch-background-span-turned-off');
         }
+        Store.devicesList[i]!!.active = device.active;
+
 
         // Assemble card
         switchBackground.append(backgroundSpan)

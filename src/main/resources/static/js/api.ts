@@ -2,10 +2,10 @@ import Store from './store.js';
 import type Device from "./models/device";
 import { drawInitialState, addOrDeleteDeviceCard } from "./overlay.js";
 
-const baseUrl = 'http://localhost:8080/devices/'
+const baseUrl = 'http://localhost:8080/devices'
 
 export function createSseConnection(deviceId: number) {
-    const getUrl = baseUrl + `${deviceId}/reachable-devices`;
+    const getUrl = baseUrl + `/${deviceId}/reachable-devices`;
     Store.eventSource = new EventSource(getUrl);
     console.log("New event source created")
     Store.eventSource.addEventListener("INITIAL_STATE", (e) => {
@@ -41,7 +41,7 @@ export async function performPatchRequest(deviceId: number, active: boolean): Pr
     const body = {
         active: active,
     }
-    const response = await fetch(baseUrl + deviceId.toString(), {
+    const response = await fetch(baseUrl + '/' + deviceId.toString(), {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',

@@ -31,7 +31,7 @@ document.addEventListener("click", (e) => {
         closePopup(element.closest('.popup-switch-container'));
     }
 });
-document.addEventListener("DOMContentLoaded", () => {
-    seeder();
-});
+document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, void 0, function* () {
+    yield seeder();
+}));
 //# sourceMappingURL=app.js.map

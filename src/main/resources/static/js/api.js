@@ -9,9 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import Store from './store.js';
 import { drawInitialState, addOrDeleteDeviceCard } from "./overlay.js";
-const baseUrl = 'http://localhost:8080/devices/';
+const baseUrl = 'http://localhost:8080/devices';
 export function createSseConnection(deviceId) {
-    const getUrl = baseUrl + `${deviceId}/reachable-devices`;
+    const getUrl = baseUrl + `/${deviceId}/reachable-devices`;
     Store.eventSource = new EventSource(getUrl);
     console.log("New event source created");
     Store.eventSource.addEventListener("INITIAL_STATE", (e) => {
@@ -31,12 +31,23 @@ export function closeSseConnection() {
         Store.eventSource = null;
     }
 }
+export function getAllDevices() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield fetch(baseUrl, {
+            method: 'GET',
+        });
+        if (!response.ok) {
+            throw new Error("Unable to get all devices");
+        }
+        return yield response.json();
+    });
+}
 export function performPatchRequest(deviceId, active) {
     return __awaiter(this, void 0, void 0, function* () {
         const body = {
             active: active,
         };
-        const response = yield fetch(baseUrl + deviceId.toString(), {
+        const response = yield fetch(baseUrl + '/' + deviceId.toString(), {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',

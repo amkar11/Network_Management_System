@@ -56,8 +56,6 @@ class Store {
     set isPopupSwitchTurnedOff(newState: boolean) {
          this.state.isPopupSwitchTurnedOff = newState;
     }
-
-
 }
 
 export default new Store();

@@ -34,8 +34,6 @@ import { clearOverlay } from "./overlay.js";
     } else {
         openOrUpdatePopup(`You turned on the device with id ${deviceId}`);
     }
-
-    sessionStorage.setItem('devices', JSON.stringify(Store.devicesList));
 }
 
 export function toggleSubscription(e: Event) {
